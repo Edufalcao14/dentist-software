@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id @default(uuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  email      String    @unique
+  firstName  String
+  lastName   String
+  isAdmin    Boolean   @default(false)
+  externalId String    @unique
+
+  dentist Dentist?
+  patient Patient?
+}
+
+model Dentist {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patients     Patient[]
+  appointments Appointment[]
+}
+
+model Patient {
+  id    String  @id @default(uuid())
+  name  String
+  email String?
+  phone String?
+
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id])
+
+  dentistId String
+  dentist   Dentist @relation(fields: [dentistId], references: [id])
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+}
+
+model Appointment {
+  id        String   @id @default(uuid())
+  date      DateTime
+  notes     String?
+  patientId String
+  patient   Patient  @relation(fields: [patientId], references: [id])
+  dentistId String
+  dentist   Dentist  @relation(fields: [dentistId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
