@@ -10,57 +10,235 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id         String    @id @default(uuid())
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  deletedAt  DateTime?
-  email      String    @unique
-  firstName  String
-  lastName   String
-  isAdmin    Boolean   @default(false)
-  externalId String    @unique
+// =================================================================
+// 1. Core Entities: Clinic, Dentist, Patient
+// =================================================================
 
-  dentist Dentist?
-  patient Patient?
+model Clinic {
+  id               Int     @id @default(autoincrement())
+  name             String  @db.VarChar(255)
+  address          String
+  CNPJ             String? @db.VarChar(18) @unique
+  email_contact    String  @db.VarChar(255) @unique
+  phone_number     String  @db.VarChar(20)
+  
+  // Relationship to Owner Dentist
+  owner_dentist_id Int? @unique
+  owner_dentist    Dentist? @relation("OwnedClinic", fields: [owner_dentist_id], references: [id], onDelete: SetNull)
+
+  // Relationships
+  dentists         Dentist[] @relation("ClinicStaff")
+  appointments     Appointment[]
+  payments         Payment[]
+  
+  // Audit fields
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  deleted_at       DateTime?
 }
 
 model Dentist {
-  id        String   @id @default(uuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               Int     @id @default(autoincrement())
+  firstname        String  @db.VarChar(100)
+  lastname         String  @db.VarChar(100)
+  phone_number     String  @db.VarChar(20)
+  email            String  @db.VarChar(255) @unique
+  cro_number       String  @db.VarChar(50) @unique
+  specialization   String  @db.VarChar(100)
+  role             String  @db.VarChar(50) @default("Associate") // Admin, Associate, Hygienist
+  is_active        Boolean @default(true)
+  
+  // Relationship to Clinic (Staff)
+  clinic_id        Int
+  clinic           Clinic @relation("ClinicStaff", fields: [clinic_id], references: [id])
 
-  patients     Patient[]
-  appointments Appointment[]
+  // Relationships
+  appointments     Appointment[]
+  
+  // Relationship as Clinic Owner
+  owned_clinic     Clinic? @relation("OwnedClinic")
+
+  // Audit fields
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  deleted_at       DateTime?
 }
 
 model Patient {
-  id    String  @id @default(uuid())
-  name  String
-  email String?
-  phone String?
+  id               Int     @id @default(autoincrement())
+  firstname        String  @db.VarChar(100)
+  lastname         String  @db.VarChar(100)
+  national_id      String? @db.VarChar(50) @unique
+  cpf              String? @db.VarChar(14) @unique
+  birthdate        DateTime @db.Date // Use Date type for birthdate
+  civil_state      String? @db.VarChar(50) // e.g., Single, Married, Divorced, Widowed
+  email_contact    String? @db.VarChar(255)
+  number_contact   String  @db.VarChar(20)
 
-  userId String? @unique
-  user   User?   @relation(fields: [userId], references: [id])
-
-  dentistId String
-  dentist   Dentist @relation(fields: [dentistId], references: [id])
-
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  appointments Appointment[]
+  // Relationships
+  appointments     Appointment[]
+  invoices         Invoice[]
+  responses        PatientResponse[]
+  
+  // Audit fields
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  deleted_at       DateTime?
 }
 
+
+// =================================================================
+// 2. Scheduling and Services
+// =================================================================
+
 model Appointment {
-  id        String   @id @default(uuid())
-  date      DateTime
-  notes     String?
-  patientId String
-  patient   Patient  @relation(fields: [patientId], references: [id])
-  dentistId String
-  dentist   Dentist  @relation(fields: [dentistId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               Int     @id @default(autoincrement())
+  date_hour        DateTime
+  status           String  @db.VarChar(50) // e.g., Scheduled, Completed, Canceled
+  diagnosis        String?
+
+  // Relationships
+  patient_id       Int
+  patient          Patient @relation(fields: [patient_id], references: [id])
+  
+  dentist_id       Int
+  dentist          Dentist @relation(fields: [dentist_id], references: [id])
+
+  clinic_id        Int
+  clinic           Clinic @relation(fields: [clinic_id], references: [id])
+
+  services_performed ServicePerformed[]
+
+  // Audit fields
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  deleted_at       DateTime?
+}
+
+model ServiceCatalog {
+  id               Int     @id @default(autoincrement())
+  name             String  @db.VarChar(255) @unique
+  standard_price   Decimal @db.Decimal(10, 2)
+  description      String?
+
+  // Relationships
+  services_performed ServicePerformed[]
+}
+
+model ServicePerformed {
+  id               Int     @id @default(autoincrement())
+  price_charged    Decimal @db.Decimal(10, 2)
+  notes            String?
+  
+  // Relationships
+  appointment_id   Int
+  appointment      Appointment @relation(fields: [appointment_id], references: [id])
+  
+  service_id       Int
+  service          ServiceCatalog @relation(fields: [service_id], references: [id])
+
+  invoice_line_item InvoiceLineItem? // 1:1 relationship for invoicing
+  
+  // Audit fields
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  deleted_at       DateTime?
+}
+
+
+// =================================================================
+// 3. Financial Tracking: Invoices and Payments
+// =================================================================
+
+model Invoice {
+  id               Int     @id @default(autoincrement())
+  invoice_date     DateTime @db.Date
+  due_date         DateTime @db.Date
+  total_amount     Decimal @db.Decimal(10, 2)
+  status           String  @db.VarChar(50) // e.g., Unpaid, Paid, Partially Paid, Overdue
+
+  // Relationships
+  patient_id       Int
+  patient          Patient @relation(fields: [patient_id], references: [id])
+  
+  line_items       InvoiceLineItem[]
+  payments         Payment[]
+}
+
+model InvoiceLineItem {
+  id               Int     @id @default(autoincrement())
+  amount_charged   Decimal @db.Decimal(10, 2)
+  
+  // Relationships
+  invoice_id       Int
+  invoice          Invoice @relation(fields: [invoice_id], references: [id])
+
+  service_performed_id Int @unique // Enforces 1:1 or 1:0 relationship
+  service_performed    ServicePerformed @relation(fields: [service_performed_id], references: [id])
+}
+
+model PaymentMethod {
+  id               Int     @id @default(autoincrement())
+  name             String  @db.VarChar(100) @unique
+  is_active        Boolean @default(true)
+
+  // Relationships
+  payments         Payment[]
+}
+
+model Payment {
+  id               Int     @id @default(autoincrement())
+  payment_date     DateTime
+  amount           Decimal @db.Decimal(10, 2)
+
+  // Relationships
+  invoice_id       Int
+  invoice          Invoice @relation(fields: [invoice_id], references: [id])
+  
+  clinic_id        Int
+  clinic           Clinic @relation(fields: [clinic_id], references: [id])
+  
+  payment_method_id Int
+  payment_method   PaymentMethod @relation(fields: [payment_method_id], references: [id])
+}
+
+
+// =================================================================
+// 4. Clinical History and Records
+// =================================================================
+
+model MedicalQuestionnaire {
+  id               Int     @id @default(autoincrement())
+  name             String  @db.VarChar(100) // Form Version Name
+  is_active        Boolean @default(true)
+
+  // Relationships
+  questions        QuestionnaireQuestion[]
+}
+
+model QuestionnaireQuestion {
+  id               Int     @id @default(autoincrement())
+  question_text    String
+  response_type    String  @db.VarChar(50) // e.g., Yes/No, Text, Multi-select
+
+  // Relationships
+  questionnaire_id Int
+  questionnaire    MedicalQuestionnaire @relation(fields: [questionnaire_id], references: [id])
+  
+  responses        PatientResponse[]
+}
+
+model PatientResponse {
+  id               Int     @id @default(autoincrement())
+  response_value   String
+  date_submitted   DateTime
+
+  // Relationships
+  patient_id       Int
+  patient          Patient @relation(fields: [patient_id], references: [id])
+  
+  question_id      Int
+  question         QuestionnaireQuestion @relation(fields: [question_id], references: [id])
+  
+  @@unique([patient_id, question_id]) // A patient answers a specific question once (first time at clinic)
 }
