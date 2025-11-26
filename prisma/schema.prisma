@@ -47,6 +47,7 @@ model Dentist {
   specialization   String  @db.VarChar(100)
   role             String  @db.VarChar(50) @default("Associate") // Admin, Associate, Hygienist
   is_active        Boolean @default(true)
+  external_id      String? @db.VarChar(255) @unique // Firebase UID
   
   // Relationship to Clinic (Staff)
   clinic_id        Int

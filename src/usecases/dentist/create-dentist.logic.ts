@@ -11,17 +11,16 @@ export const createDentist = async (
 ): Promise<DentistEntity> => {
   validateInput(input);
 
-  const dentistData: {
-    firstname: string;
-    lastname: string;
-    phone_number: string;
-    email: string;
-    cro_number: string;
-    specialization: string;
-    role: string;
-    is_active: boolean;
-    clinic_id?: number;
-  } = {
+  // First, create user in Firebase (IAM Gateway)
+  const displayName = `${input.firstname} ${input.lastname}`;
+  const externalId = await context.gateways.iam.createUser(
+    input.email,
+    input.password,
+    displayName,
+  );
+
+  // Then, create dentist with the external_id from Firebase
+  const dentistData = {
     firstname: input.firstname,
     lastname: input.lastname,
     phone_number: input.phone_number,
@@ -30,28 +29,11 @@ export const createDentist = async (
     specialization: input.specialization ?? '',
     role: input.role ?? DentistRole.OWNER,
     is_active: input.is_active,
+    external_id: externalId,
+    ...(input.clinic_id && { clinic_id: parseInt(input.clinic_id, 10) }),
   };
 
-  if (input.clinic_id) {
-    dentistData.clinic_id = parseInt(input.clinic_id, 10);
-  }
-
-  const dentist = await context.db.dentist.create({
-    data: dentistData as any,
-  });
-
-  return {
-    id: dentist.id.toString(),
-    firstname: dentist.firstname,
-    lastname: dentist.lastname,
-    phone_number: dentist.phone_number,
-    email: dentist.email,
-    cro_number: dentist.cro_number,
-    specialization: dentist.specialization,
-    role: dentist.role,
-    is_active: dentist.is_active,
-    clinic_id: dentist.clinic_id?.toString() ?? null,
-  };
+  return await context.repositories.dentist.create(dentistData);
 };
 
 function validateInput(input: CreateDentistInput) {
@@ -77,6 +59,11 @@ function validateInput(input: CreateDentistInput) {
       .required('email é obrigatório')
       .notOneOf([''], 'email não pode estar vazio')
       .max(255, 'email deve ter no máximo 255 caracteres'),
+    password: yup
+      .string()
+      .required('senha é obrigatória')
+      .min(6, 'senha deve ter no mínimo 6 caracteres')
+      .max(100, 'senha deve ter no máximo 100 caracteres'),
     cro_number: yup
       .string()
       .required('número CRO é obrigatório')

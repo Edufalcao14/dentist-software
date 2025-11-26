@@ -14,6 +14,7 @@ import { initResolvers } from './resolvers';
 import { errorFormatter } from './errors/error-formatter';
 import { errorLoggingPlugin } from './errors/error-logging-plugin';
 import { IAMGateway } from '../gateways/iam-gateway';
+import { initRepositories } from '../repositories';
 
 export const initGraphQL = async (
   httpServer: http.Server,
@@ -30,6 +31,7 @@ export const initGraphQL = async (
   );
 
   const usecases = initUsecases();
+  const repositories = initRepositories(db);
 
   const server = new ApolloServer<AppContext>({
     nodeEnv: config.graphql?.sandbox !== false ? 'development' : 'production',
@@ -74,12 +76,11 @@ export const initGraphQL = async (
         return {
           config,
           logger,
-          repositories: {}, // TODO: Initialize repositories when available
+          repositories,
           gateways: {
             iam: iamGateway,
           },
           auth,
-          db,
         };
       },
     }),

@@ -1,10 +1,60 @@
 scalar Email
 scalar DateTime
 
+enum DentistRole {
+  Owner
+  Admin
+  hired
+}
+
+type Dentist {
+  id: String!
+  firstname: String!
+  lastname: String!
+  phone_number: String!
+  email: Email!
+  cro_number: String!
+  specialization: String!
+  role: String!
+  is_active: Boolean!
+  clinic_id: String
+  external_id: String
+}
+
+input CreateDentistInput {
+  firstname: String!
+  lastname: String!
+  phone_number: String!
+  email: Email!
+  password: String!
+  cro_number: String!
+  specialization: String
+  role: String
+  is_active: Boolean!
+  clinic_id: String
+}
+
+input UpdateDentistInput {
+  firstname: String
+  lastname: String
+  phone_number: String
+  email: Email
+  cro_number: String
+  specialization: String
+  role: String
+  is_active: Boolean
+  clinic_id: String
+}
+
 type Query {
   _empty: String
+  getDentistById(id: String!): Dentist!
+  getDentistByEmail(email: Email!): Dentist!
 }
 
 type Mutation {
   _empty: String
+  createDentist(input: CreateDentistInput!): Dentist!
+  updateDentist(id: String!, input: UpdateDentistInput!): Dentist!
+  deleteDentist(id: String!): Dentist!
 }

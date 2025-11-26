@@ -9,4 +9,5 @@ export type DentistEntity = {
   role: string;
   is_active: boolean;
   clinic_id: string | null;
+  external_id: string | null;
 };
