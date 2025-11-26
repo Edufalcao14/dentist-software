@@ -1,4 +1,5 @@
 import Logger from 'bunyan';
+import { PrismaClient } from '@prisma/client';
 import { Config } from './config';
 // import { Repositories } from '../repositories'; // TODO: Implement Repositories
 // import { Gateways } from '../gateways'; // TODO: Implement Gateways
@@ -13,6 +14,7 @@ export type AppContext = {
   repositories: Repositories;
   gateways: Gateways;
   auth: AuthContext;
+  db: PrismaClient;
 };
 
 type AuthContextUnauthenticated = {

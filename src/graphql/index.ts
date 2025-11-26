@@ -6,8 +6,10 @@ import cors from 'cors';
 import http from 'http';
 import { readFile } from 'fs/promises';
 import path from 'path';
+import { PrismaClient } from '@prisma/client';
 import { Config } from '../libs/config';
 import { AppContext, AuthContext } from '../libs/context';
+import { initUsecases } from '../usecases';
 import { initResolvers } from './resolvers';
 import { errorFormatter } from './errors/error-formatter';
 import { errorLoggingPlugin } from './errors/error-logging-plugin';
@@ -18,6 +20,7 @@ export const initGraphQL = async (
   config: Config,
   logger: any,
   iamGateway: IAMGateway,
+  db: PrismaClient,
 ): Promise<Router> => {
   const router = Router();
 
@@ -26,10 +29,12 @@ export const initGraphQL = async (
     'utf8',
   );
 
+  const usecases = initUsecases();
+
   const server = new ApolloServer<AppContext>({
     nodeEnv: config.graphql?.sandbox !== false ? 'development' : 'production',
     typeDefs,
-    resolvers: initResolvers(),
+    resolvers: initResolvers(usecases),
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       errorLoggingPlugin(logger),
@@ -47,6 +52,7 @@ export const initGraphQL = async (
     }),
     express.json(),
     expressMiddleware(server, {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       context: async ({ req, res }): Promise<AppContext> => {
         const { operationName } = req.body;
         let auth: AuthContext = {
@@ -73,6 +79,7 @@ export const initGraphQL = async (
             iam: iamGateway,
           },
           auth,
+          db,
         };
       },
     }),
