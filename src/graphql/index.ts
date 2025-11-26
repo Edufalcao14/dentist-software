@@ -1,0 +1,82 @@
+import express, { Router } from 'express';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import cors from 'cors';
+import http from 'http';
+import { readFile } from 'fs/promises';
+import path from 'path';
+import { Config } from '../libs/config';
+import { AppContext, AuthContext } from '../libs/context';
+import { initResolvers } from './resolvers';
+import { errorFormatter } from './errors/error-formatter';
+import { errorLoggingPlugin } from './errors/error-logging-plugin';
+import { IAMGateway } from '../gateways/iam-gateway';
+
+export const initGraphQL = async (
+  httpServer: http.Server,
+  config: Config,
+  logger: any,
+  iamGateway: IAMGateway,
+): Promise<Router> => {
+  const router = Router();
+
+  const typeDefs = await readFile(
+    path.join(__dirname, '/schema.graphql'),
+    'utf8',
+  );
+
+  const server = new ApolloServer<AppContext>({
+    nodeEnv: config.graphql?.sandbox !== false ? 'development' : 'production',
+    typeDefs,
+    resolvers: initResolvers(),
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      errorLoggingPlugin(logger),
+    ],
+    formatError: errorFormatter,
+  });
+
+  await server.start();
+
+  // Middlewares
+  router.use(
+    cors<cors.CorsRequest>({
+      methods: ['GET', 'POST', 'OPTIONS'],
+      origin: config.cors?.origin || '*',
+    }),
+    express.json(),
+    expressMiddleware(server, {
+      context: async ({ req, res }): Promise<AppContext> => {
+        const { operationName } = req.body;
+        let auth: AuthContext = {
+          isAuthenticated: false,
+        };
+        let authHeader = req.headers.authorization;
+        if (authHeader && operationName !== 'IntrospectionQuery') {
+          authHeader = authHeader.replace(/^bearer /gim, '');
+          try {
+            auth = await iamGateway.getAuthAndValidateToken(authHeader);
+          } catch (error) {
+            // If token validation fails, keep unauthenticated state
+            auth = {
+              isAuthenticated: false,
+            };
+          }
+        }
+
+        return {
+          config,
+          logger,
+          repositories: {}, // TODO: Initialize repositories when available
+          gateways: {
+            iam: iamGateway,
+          },
+          auth,
+        };
+      },
+    }),
+  );
+
+  return router;
+};

@@ -8,21 +8,28 @@
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "graphql:generate": "graphql-codegen --config src/graphql/codegen.yaml && yarn format",
+    "graphql:generate:watch": "graphql-codegen -w --config src/graphql/codegen.yaml"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@apollo/server": "^4.10.0",
     "bunyan": "^1.8.15",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "firebase": "^10.12.0",
     "firebase-admin": "^12.1.0",
+    "graphql": "^16.8.1",
     "helmet": "^7.1.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.2",
+    "@graphql-codegen/typescript": "4.0.6",
+    "@graphql-codegen/typescript-resolvers": "4.0.6",
     "@prisma/client": "^5.22.0",
     "@types/bunyan": "^1.8.11",
     "@types/cors": "^2.8.17",
