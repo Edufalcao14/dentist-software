@@ -20,4 +20,3 @@ export const initDentistRepositories = (db: PrismaClient) => {
 };
 
 export type DentistRepositories = ReturnType<typeof initDentistRepositories>;
-

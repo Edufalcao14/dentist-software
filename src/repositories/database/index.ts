@@ -8,4 +8,3 @@ export const initRepositories = (db: PrismaClient) => {
 };
 
 export type Repositories = ReturnType<typeof initRepositories>;
-

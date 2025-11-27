@@ -44,14 +44,14 @@ model Dentist {
   phone_number     String  @db.VarChar(20)
   email            String  @db.VarChar(255) @unique
   cro_number       String  @db.VarChar(50) @unique
-  specialization   String  @db.VarChar(100)
-  role             String  @db.VarChar(50) @default("Associate") // Admin, Associate, Hygienist
+  specialization   String? @db.VarChar(100)
+  role             String? @db.VarChar(50) @default("Associate") // Admin, Associate, Hygienist
   is_active        Boolean @default(true)
   external_id      String? @db.VarChar(255) @unique // Firebase UID
   
   // Relationship to Clinic (Staff)
-  clinic_id        Int
-  clinic           Clinic @relation("ClinicStaff", fields: [clinic_id], references: [id])
+  clinic_id        Int?
+  clinic           Clinic? @relation("ClinicStaff", fields: [clinic_id], references: [id])
 
   // Relationships
   appointments     Appointment[]

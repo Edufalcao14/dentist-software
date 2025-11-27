@@ -6,9 +6,7 @@ export const getDentistById = async (
   context: AppContext,
   id: string,
 ): Promise<DentistEntity> => {
-  const dentist = await context.repositories.dentist.getById(
-    parseInt(id, 10),
-  );
+  const dentist = await context.repositories.dentist.getById(parseInt(id, 10));
 
   if (!dentist) {
     throw new NotFoundError('Dentist not found', { id });

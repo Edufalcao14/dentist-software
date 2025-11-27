@@ -16,4 +16,3 @@ export const initSoftDeleteDentistRepository = (db: PrismaClient) => {
     return mapToEntity(dentist);
   };
 };
-

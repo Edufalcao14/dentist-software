@@ -270,7 +270,11 @@ export const initIAMGateway = (config: Config) => {
         throw new NotFoundError('Firebase user not found', { uid }, err.stack);
       }
       if (err.code === 'auth/email-already-exists') {
-        throw new BadRequestError(err.message, { email: updates.email }, err.stack);
+        throw new BadRequestError(
+          err.message,
+          { email: updates.email },
+          err.stack,
+        );
       }
       throw new UnknownError(err.message, { uid }, err.stack);
     }

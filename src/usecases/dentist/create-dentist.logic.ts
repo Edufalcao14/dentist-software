@@ -2,6 +2,7 @@ import { AppContext } from '../../libs/context';
 import { CreateDentistInput } from '../../entities/dentist/create-dentist-input';
 import { DentistEntity } from '../../entities/dentist/dentist';
 import { DentistRole } from '../../entities/dentist/dentist-role';
+import { DentistSpecialization } from '../../entities/dentist/dentist-specialization';
 import { BadUserInputError } from '../../entities/errors/bad-user-input-error';
 import * as yup from 'yup';
 
@@ -26,8 +27,8 @@ export const createDentist = async (
     phone_number: input.phone_number,
     email: input.email,
     cro_number: input.cro_number,
-    specialization: input.specialization ?? '',
-    role: input.role ?? DentistRole.OWNER,
+    specialization: input.specialization ?? null,
+    role: input.role ?? null,
     is_active: input.is_active,
     external_id: externalId,
     ...(input.clinic_id && { clinic_id: parseInt(input.clinic_id, 10) }),
@@ -72,13 +73,16 @@ function validateInput(input: CreateDentistInput) {
     specialization: yup
       .string()
       .nullable()
-      .max(100, 'especialização deve ter no máximo 100 caracteres'),
+      .oneOf(
+        Object.values(DentistSpecialization),
+        `especialização deve ser uma das seguintes: ${Object.values(DentistSpecialization).join(', ')}`,
+      ),
     role: yup
       .string()
       .nullable()
       .oneOf(
         Object.values(DentistRole),
-        'função deve ser uma das seguintes: Admin, Associate, Hygienist',
+        `função deve ser uma das seguintes: ${Object.values(DentistRole).join(', ')}`,
       ),
     is_active: yup.boolean().required('is_active é obrigatório'),
     clinic_id: yup

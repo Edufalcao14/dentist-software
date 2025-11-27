@@ -1,33 +1,23 @@
-import { Usecases } from '../../usecases';
-import { Resolvers } from '../__generated__/resolvers-types';
-import { initAuthModuleResolvers } from './auth';
 import { initScalars } from './scalars';
-import { initUserModuleResolvers } from './user';
+import { initDentistModuleResolvers } from './dentist';
+import { Resolvers } from '../__generated__/resolvers-types';
+import { Usecases } from '../../usecases';
 
 export const initResolvers = (usecases: Usecases): Resolvers => {
   const {
-    Query: userQueries,
-    Mutation: userMutations,
-    ...userResolvers
-  } = initUserModuleResolvers(usecases);
-
-  const {
-    Query: authQueries,
-    Mutation: authMutations,
-    ...authResolvers
-  } = initAuthModuleResolvers(usecases);
+    Query: dentistQueries,
+    Mutation: dentistMutations,
+    ...dentistResolvers
+  } = initDentistModuleResolvers(usecases);
 
   return {
     ...initScalars(),
     Query: {
-      ...userQueries,
-      ...authQueries,
+      ...dentistQueries,
     },
     Mutation: {
-      ...userMutations,
-      ...authMutations,
+      ...dentistMutations,
     },
-    ...userResolvers,
-    ...authResolvers,
+    ...dentistResolvers,
   };
 };

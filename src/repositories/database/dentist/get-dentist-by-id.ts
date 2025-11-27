@@ -18,4 +18,3 @@ export const initGetDentistByIdRepository = (db: PrismaClient) => {
     return mapToEntity(dentist);
   };
 };
-

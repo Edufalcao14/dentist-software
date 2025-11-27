@@ -4,7 +4,10 @@ ARG NODE_VERSION=18
 
 ################################################################################
 # Base stage for all subsequent stages, with Node.js and working directory set up.
-FROM node:${NODE_VERSION}-alpine as base
+# Using Alpine 3.18 which has openssl1.1-compat package needed for Prisma
+FROM node:${NODE_VERSION}-alpine3.18 as base
+# Install OpenSSL 1.1.x compatibility library for Prisma
+RUN apk add --no-cache openssl1.1-compat
 WORKDIR /usr/src/app
 
 ################################################################################
@@ -30,9 +33,11 @@ FROM base as development
 # Install all dependencies (including dev).
 # This ensures that development dependencies are available for this stage.
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install
 # Copy all source files into the image.
 COPY . .
+# Generate Prisma client
+RUN npx prisma generate
 # Expose the port for the development server.
 EXPOSE 3000
 # Command to start the development server.

@@ -74,9 +74,9 @@ export const updateDentist = async (
     ...(input.email !== undefined && { email: input.email }),
     ...(input.cro_number !== undefined && { cro_number: input.cro_number }),
     ...(input.specialization !== undefined && {
-      specialization: input.specialization ?? '',
+      specialization: input.specialization,
     }),
-    ...(input.role !== undefined && { role: input.role ?? 'Associate' }),
+    ...(input.role !== undefined && { role: input.role }),
     ...(input.is_active !== undefined && { is_active: input.is_active }),
     ...(input.clinic_id !== undefined && {
       clinic_id: input.clinic_id ? parseInt(input.clinic_id, 10) : null,

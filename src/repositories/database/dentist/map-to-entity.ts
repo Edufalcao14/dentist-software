@@ -27,4 +27,3 @@ export const mapToEntity = (dentist: {
     external_id: dentist.external_id ?? null,
   };
 };
-
