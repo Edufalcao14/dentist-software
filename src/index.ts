@@ -1,6 +1,7 @@
 import bunyan from 'bunyan';
 import express from 'express';
 import http from 'http';
+import { PrismaClient } from '@prisma/client';
 import { config } from './libs/config';
 import { initIAMGateway } from './gateways/iam-gateway';
 import { initGraphQL } from './graphql';
@@ -10,6 +11,7 @@ const main = async () => {
 
   try {
     const iamGateway = initIAMGateway(config);
+    const db = new PrismaClient();
 
     // Create Express app
     const app = express();
@@ -23,6 +25,7 @@ const main = async () => {
       config,
       logger,
       iamGateway,
+      db,
     );
     app.use('/graphql', graphqlRouter);
 
@@ -30,7 +33,9 @@ const main = async () => {
     await new Promise<void>((resolve) =>
       httpServer.listen({ port: config.port }, () => {
         logger.info(`Server is running on port ${config.port}`);
-        logger.info(`GraphQL endpoint available at http://localhost:${config.port}/graphql`);
+        logger.info(
+          `GraphQL endpoint available at http://localhost:${config.port}/graphql`,
+        );
         resolve();
       }),
     );

@@ -1,11 +1,11 @@
 import Logger from 'bunyan';
 import { Config } from './config';
-// import { Repositories } from '../repositories'; // TODO: Implement Repositories
-// import { Gateways } from '../gateways'; // TODO: Implement Gateways
+import { Repositories } from '../repositories';
+import { IAMGateway } from '../gateways/iam-gateway';
 
-// Placeholder types until implemented
-export type Repositories = any;
-export type Gateways = any;
+export type Gateways = {
+  iam: IAMGateway;
+};
 
 export type AppContext = {
   config: Config;

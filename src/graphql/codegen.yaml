@@ -12,4 +12,5 @@ generates:
       useIndexSignature: true
       # More on this below!
       contextType: '../../libs/context#AppContext'
-      mappers: {}
+      mappers:
+        Dentist: '../../entities/dentist/dentist#DentistEntity'

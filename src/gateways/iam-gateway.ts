@@ -252,6 +252,34 @@ export const initIAMGateway = (config: Config) => {
       }
     }
   };
+
+  const updateUser = async (
+    uid: string,
+    updates: {
+      email?: string;
+      displayName?: string;
+    },
+  ): Promise<void> => {
+    try {
+      await admin.auth().updateUser(uid, {
+        ...(updates.email && { email: updates.email }),
+        ...(updates.displayName && { displayName: updates.displayName }),
+      });
+    } catch (err: any) {
+      if (err.code === 'auth/user-not-found') {
+        throw new NotFoundError('Firebase user not found', { uid }, err.stack);
+      }
+      if (err.code === 'auth/email-already-exists') {
+        throw new BadRequestError(
+          err.message,
+          { email: updates.email },
+          err.stack,
+        );
+      }
+      throw new UnknownError(err.message, { uid }, err.stack);
+    }
+  };
+
   return {
     createUser,
     signIn,
@@ -259,6 +287,7 @@ export const initIAMGateway = (config: Config) => {
     refreshToken: _refreshToken,
     impersonateUser,
     stopImpersonatingUser,
+    updateUser,
   };
 };
 

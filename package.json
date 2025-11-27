@@ -9,6 +9,8 @@
     "lint": "eslint . --ext .ts",
     "format": "prettier --write .",
     "prepare": "husky install",
+    "codegen": "graphql-codegen --config src/graphql/codegen.yaml && yarn format",
+    "codegen:watch": "graphql-codegen -w --config src/graphql/codegen.yaml",
     "graphql:generate": "graphql-codegen --config src/graphql/codegen.yaml && yarn format",
     "graphql:generate:watch": "graphql-codegen -w --config src/graphql/codegen.yaml",
     "prisma:studio": "prisma studio",
@@ -28,7 +30,8 @@
     "firebase": "^10.12.0",
     "firebase-admin": "^12.1.0",
     "graphql": "^16.8.1",
-    "helmet": "^7.1.0"
+    "helmet": "^7.1.0",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "5.0.2",
