@@ -2,11 +2,11 @@ import { PrismaClient } from '@prisma/client';
 import { DentistEntity } from '../../../entities/dentist/dentist';
 import { mapToEntity } from './mapper/map-to-entity';
 
-export const initGetDentistByEmailRepository = (db: PrismaClient) => {
-  return async (email: string): Promise<DentistEntity | null> => {
+export const initGetDentistByExternalIdRepository = (db: PrismaClient) => {
+  return async (externalId: string): Promise<DentistEntity | null> => {
     const dentist = await db.dentist.findFirst({
       where: {
-        email,
+        external_id: externalId,
         deleted_at: null,
       },
     });

@@ -232,3 +232,4 @@ Entity types don't include validation logic. Validation happens in:
 
 Entities define the **shape** of data, not the **rules**.
 
+

@@ -417,3 +417,4 @@ context.logger.info('Dentist created', {
 - Use context for all dependency access (don't import directly)
 - Mock context in tests for isolated unit testing
 
+

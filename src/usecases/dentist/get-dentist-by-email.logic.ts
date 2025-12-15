@@ -14,4 +14,3 @@ export const getDentistByEmail = async (
 
   return dentist;
 };
-

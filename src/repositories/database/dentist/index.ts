@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { initCreateDentistRepository } from './create-dentist';
 import { initGetDentistByIdRepository } from './get-dentist-by-id';
 import { initGetDentistByEmailRepository } from './get-dentist-by-email';
+import { initGetDentistByExternalIdRepository } from './get-dentist-by-external-id';
 import { initGetAllDentistsRepository } from './get-all-dentists';
 import { initUpdateDentistRepository } from './update-dentist';
 import { initSoftDeleteDentistRepository } from './soft-delete-dentist';
@@ -13,6 +14,7 @@ export const initDentistRepositories = (db: PrismaClient) => {
     create: initCreateDentistRepository(db),
     getById: initGetDentistByIdRepository(db),
     getByEmail: initGetDentistByEmailRepository(db),
+    getByExternalId: initGetDentistByExternalIdRepository(db),
     getAll: initGetAllDentistsRepository(db),
     update: initUpdateDentistRepository(db),
     softDelete: initSoftDeleteDentistRepository(db),
