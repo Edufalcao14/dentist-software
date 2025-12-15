@@ -79,7 +79,7 @@ model Patient {
   // Relationships
   appointments     Appointment[]
   invoices         Invoice[]
-  responses        PatientResponse[]
+  medical_record   MedicalRecord?
   
   // Audit fields
   created_at       DateTime @default(now())
@@ -208,38 +208,27 @@ model Payment {
 // 4. Clinical History and Records
 // =================================================================
 
-model MedicalQuestionnaire {
-  id               Int     @id @default(autoincrement())
-  name             String  @db.VarChar(100) // Form Version Name
-  is_active        Boolean @default(true)
-
-  // Relationships
-  questions        QuestionnaireQuestion[]
+model MedicalRecord {
+  id          Int                @id @default(autoincrement())
+  patient_id  Int                @unique
+  patient     Patient            @relation(fields: [patient_id], references: [id])
+  
+  rows        MedicalRecordRow[]
+  
+  created_at  DateTime           @default(now())
+  updated_at  DateTime           @updatedAt
+  deleted_at  DateTime?
 }
 
-model QuestionnaireQuestion {
-  id               Int     @id @default(autoincrement())
-  question_text    String
-  response_type    String  @db.VarChar(50) // e.g., Yes/No, Text, Multi-select
-
-  // Relationships
-  questionnaire_id Int
-  questionnaire    MedicalQuestionnaire @relation(fields: [questionnaire_id], references: [id])
+model MedicalRecordRow {
+  id                Int           @id @default(autoincrement())
+  question          String
+  answer            String
   
-  responses        PatientResponse[]
-}
-
-model PatientResponse {
-  id               Int     @id @default(autoincrement())
-  response_value   String
-  date_submitted   DateTime
-
-  // Relationships
-  patient_id       Int
-  patient          Patient @relation(fields: [patient_id], references: [id])
+  medical_record_id Int
+  medical_record    MedicalRecord @relation(fields: [medical_record_id], references: [id])
   
-  question_id      Int
-  question         QuestionnaireQuestion @relation(fields: [question_id], references: [id])
-  
-  @@unique([patient_id, question_id]) // A patient answers a specific question once (first time at clinic)
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  deleted_at        DateTime?
 }
