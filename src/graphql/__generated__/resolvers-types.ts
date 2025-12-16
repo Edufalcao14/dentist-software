@@ -52,19 +52,26 @@ export type CreateDentistInput = {
   specialization?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type CreatePatientInput = {
+  birthdate: Scalars['DateTime']['input'];
+  civil_state?: InputMaybe<Scalars['String']['input']>;
+  cpf: Scalars['String']['input'];
+  email?: InputMaybe<Scalars['Email']['input']>;
+  firstname?: InputMaybe<Scalars['String']['input']>;
+  lastname?: InputMaybe<Scalars['String']['input']>;
+  phone_number?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Dentist = {
   __typename?: 'Dentist';
   clinic_id?: Maybe<Scalars['String']['output']>;
   cro_number: Scalars['String']['output'];
-  email: Scalars['Email']['output'];
-  external_id?: Maybe<Scalars['String']['output']>;
-  firstname: Scalars['String']['output'];
   id: Scalars['String']['output'];
   is_active: Scalars['Boolean']['output'];
-  lastname: Scalars['String']['output'];
-  phone_number: Scalars['String']['output'];
   role: Scalars['String']['output'];
   specialization: Scalars['String']['output'];
+  user: User;
+  user_id: Scalars['String']['output'];
 };
 
 export enum DentistRole {
@@ -77,15 +84,26 @@ export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
   createDentist: Dentist;
+  createPatient: Patient;
   deleteDentist: Dentist;
+  deletePatient: Patient;
   updateDentist: Dentist;
+  updatePatient: Patient;
 };
 
 export type MutationCreateDentistArgs = {
   input: CreateDentistInput;
 };
 
+export type MutationCreatePatientArgs = {
+  input: CreatePatientInput;
+};
+
 export type MutationDeleteDentistArgs = {
+  id: Scalars['String']['input'];
+};
+
+export type MutationDeletePatientArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -94,11 +112,35 @@ export type MutationUpdateDentistArgs = {
   input: UpdateDentistInput;
 };
 
+export type MutationUpdatePatientArgs = {
+  id: Scalars['String']['input'];
+  input: UpdatePatientInput;
+};
+
+export type Patient = {
+  __typename?: 'Patient';
+  birthdate: Scalars['DateTime']['output'];
+  civil_state?: Maybe<Scalars['String']['output']>;
+  cpf?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  user?: Maybe<User>;
+  user_id?: Maybe<Scalars['String']['output']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   _empty?: Maybe<Scalars['String']['output']>;
+  getAllPatients: Array<Patient>;
   getDentistByEmail: Dentist;
   getDentistById: Dentist;
+  getPatientByCpf: Patient;
+  getPatientByEmail: Patient;
+  getPatientById: Patient;
+};
+
+export type QueryGetAllPatientsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type QueryGetDentistByEmailArgs = {
@@ -106,6 +148,18 @@ export type QueryGetDentistByEmailArgs = {
 };
 
 export type QueryGetDentistByIdArgs = {
+  id: Scalars['String']['input'];
+};
+
+export type QueryGetPatientByCpfArgs = {
+  cpf: Scalars['String']['input'];
+};
+
+export type QueryGetPatientByEmailArgs = {
+  email: Scalars['Email']['input'];
+};
+
+export type QueryGetPatientByIdArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -121,6 +175,28 @@ export type UpdateDentistInput = {
   specialization?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdatePatientInput = {
+  birthdate?: InputMaybe<Scalars['DateTime']['input']>;
+  civil_state?: InputMaybe<Scalars['String']['input']>;
+  cpf?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type User = {
+  __typename?: 'User';
+  email: Scalars['Email']['output'];
+  external_id?: Maybe<Scalars['String']['output']>;
+  firstname: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  lastname: Scalars['String']['output'];
+  phone_number: Scalars['String']['output'];
+  role: UserRole;
+};
+
+export enum UserRole {
+  Dentist = 'dentist',
+  Patient = 'patient',
+}
+
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
 
@@ -129,12 +205,7 @@ export type ResolverTypeWrapper<T> = Promise<T> | T;
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
   resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
-export type Resolver<
-  TResult,
-  TParent = Record<PropertyKey, never>,
-  TContext = Record<PropertyKey, never>,
-  TArgs = Record<PropertyKey, never>,
-> =
+export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
   | ResolverFn<TResult, TParent, TContext, TArgs>
   | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
 
@@ -198,29 +269,22 @@ export type SubscriptionObject<
 export type SubscriptionResolver<
   TResult,
   TKey extends string,
-  TParent = Record<PropertyKey, never>,
-  TContext = Record<PropertyKey, never>,
-  TArgs = Record<PropertyKey, never>,
+  TParent = {},
+  TContext = {},
+  TArgs = {},
 > =
   | ((
       ...args: any[]
     ) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
   | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
 
-export type TypeResolveFn<
-  TTypes,
-  TParent = Record<PropertyKey, never>,
-  TContext = Record<PropertyKey, never>,
-> = (
+export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
   parent: TParent,
   context: TContext,
   info: GraphQLResolveInfo,
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
 
-export type IsTypeOfResolverFn<
-  T = Record<PropertyKey, never>,
-  TContext = Record<PropertyKey, never>,
-> = (
+export type IsTypeOfResolverFn<T = {}, TContext = {}> = (
   obj: T,
   context: TContext,
   info: GraphQLResolveInfo,
@@ -229,10 +293,10 @@ export type IsTypeOfResolverFn<
 export type NextResolverFn<T> = () => Promise<T>;
 
 export type DirectiveResolverFn<
-  TResult = Record<PropertyKey, never>,
-  TParent = Record<PropertyKey, never>,
-  TContext = Record<PropertyKey, never>,
-  TArgs = Record<PropertyKey, never>,
+  TResult = {},
+  TParent = {},
+  TContext = {},
+  TArgs = {},
 > = (
   next: NextResolverFn<TResult>,
   parent: TParent,
@@ -245,27 +309,38 @@ export type DirectiveResolverFn<
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   CreateDentistInput: CreateDentistInput;
+  CreatePatientInput: CreatePatientInput;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Dentist: ResolverTypeWrapper<DentistEntity>;
   DentistRole: DentistRole;
   Email: ResolverTypeWrapper<Scalars['Email']['output']>;
-  Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
-  Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  Mutation: ResolverTypeWrapper<{}>;
+  Patient: ResolverTypeWrapper<Patient>;
+  Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   UpdateDentistInput: UpdateDentistInput;
+  UpdatePatientInput: UpdatePatientInput;
+  User: ResolverTypeWrapper<User>;
+  UserRole: UserRole;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   CreateDentistInput: CreateDentistInput;
+  CreatePatientInput: CreatePatientInput;
   DateTime: Scalars['DateTime']['output'];
   Dentist: DentistEntity;
   Email: Scalars['Email']['output'];
-  Mutation: Record<PropertyKey, never>;
-  Query: Record<PropertyKey, never>;
+  Int: Scalars['Int']['output'];
+  Mutation: {};
+  Patient: Patient;
+  Query: {};
   String: Scalars['String']['output'];
   UpdateDentistInput: UpdateDentistInput;
+  UpdatePatientInput: UpdatePatientInput;
+  User: User;
 }>;
 
 export interface DateTimeScalarConfig
@@ -284,19 +359,13 @@ export type DentistResolvers<
     ContextType
   >;
   cro_number?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  email?: Resolver<ResolversTypes['Email'], ParentType, ContextType>;
-  external_id?: Resolver<
-    Maybe<ResolversTypes['String']>,
-    ParentType,
-    ContextType
-  >;
-  firstname?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   is_active?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  lastname?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  phone_number?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   specialization?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  user_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export interface EmailScalarConfig
@@ -316,11 +385,23 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationCreateDentistArgs, 'input'>
   >;
+  createPatient?: Resolver<
+    ResolversTypes['Patient'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreatePatientArgs, 'input'>
+  >;
   deleteDentist?: Resolver<
     ResolversTypes['Dentist'],
     ParentType,
     ContextType,
     RequireFields<MutationDeleteDentistArgs, 'id'>
+  >;
+  deletePatient?: Resolver<
+    ResolversTypes['Patient'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeletePatientArgs, 'id'>
   >;
   updateDentist?: Resolver<
     ResolversTypes['Dentist'],
@@ -328,6 +409,30 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationUpdateDentistArgs, 'id' | 'input'>
   >;
+  updatePatient?: Resolver<
+    ResolversTypes['Patient'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationUpdatePatientArgs, 'id' | 'input'>
+  >;
+}>;
+
+export type PatientResolvers<
+  ContextType = AppContext,
+  ParentType extends
+    ResolversParentTypes['Patient'] = ResolversParentTypes['Patient'],
+> = ResolversObject<{
+  birthdate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  civil_state?: Resolver<
+    Maybe<ResolversTypes['String']>,
+    ParentType,
+    ContextType
+  >;
+  cpf?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  user_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type QueryResolvers<
@@ -336,6 +441,12 @@ export type QueryResolvers<
     ResolversParentTypes['Query'] = ResolversParentTypes['Query'],
 > = ResolversObject<{
   _empty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  getAllPatients?: Resolver<
+    Array<ResolversTypes['Patient']>,
+    ParentType,
+    ContextType,
+    Partial<QueryGetAllPatientsArgs>
+  >;
   getDentistByEmail?: Resolver<
     ResolversTypes['Dentist'],
     ParentType,
@@ -348,6 +459,43 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryGetDentistByIdArgs, 'id'>
   >;
+  getPatientByCpf?: Resolver<
+    ResolversTypes['Patient'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetPatientByCpfArgs, 'cpf'>
+  >;
+  getPatientByEmail?: Resolver<
+    ResolversTypes['Patient'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetPatientByEmailArgs, 'email'>
+  >;
+  getPatientById?: Resolver<
+    ResolversTypes['Patient'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetPatientByIdArgs, 'id'>
+  >;
+}>;
+
+export type UserResolvers<
+  ContextType = AppContext,
+  ParentType extends
+    ResolversParentTypes['User'] = ResolversParentTypes['User'],
+> = ResolversObject<{
+  email?: Resolver<ResolversTypes['Email'], ParentType, ContextType>;
+  external_id?: Resolver<
+    Maybe<ResolversTypes['String']>,
+    ParentType,
+    ContextType
+  >;
+  firstname?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  lastname?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  phone_number?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  role?: Resolver<ResolversTypes['UserRole'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = AppContext> = ResolversObject<{
@@ -355,5 +503,7 @@ export type Resolvers<ContextType = AppContext> = ResolversObject<{
   Dentist?: DentistResolvers<ContextType>;
   Email?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
+  Patient?: PatientResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  User?: UserResolvers<ContextType>;
 }>;

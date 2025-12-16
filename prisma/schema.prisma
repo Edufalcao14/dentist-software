@@ -11,8 +11,27 @@ datasource db {
 }
 
 // =================================================================
-// 1. Core Entities: Clinic, Dentist, Patient
+// 1. Core Entities: User, Clinic, Dentist, Patient
 // =================================================================
+
+model User {
+  id               Int     @id @default(autoincrement())
+  external_id      String? @db.VarChar(255) @unique // Firebase UID
+  email            String  @db.VarChar(255) @unique
+  firstname        String  @db.VarChar(100)
+  lastname         String  @db.VarChar(100)
+  phone_number     String  @db.VarChar(20)
+  role             String  @db.VarChar(50) // 'dentist' or 'patient'
+  
+  // Relationships
+  dentist          Dentist?
+  patient          Patient?
+  
+  // Audit fields
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  deleted_at       DateTime?
+}
 
 model Clinic {
   id               Int     @id @default(autoincrement())
@@ -39,15 +58,12 @@ model Clinic {
 
 model Dentist {
   id               Int     @id @default(autoincrement())
-  firstname        String  @db.VarChar(100)
-  lastname         String  @db.VarChar(100)
-  phone_number     String  @db.VarChar(20)
-  email            String  @db.VarChar(255) @unique
+  user_id          Int     @unique
+  user             User    @relation(fields: [user_id], references: [id])
   cro_number       String  @db.VarChar(50) @unique
   specialization   String? @db.VarChar(100)
   role             String? @db.VarChar(50) @default("Associate") // Admin, Associate, Hygienist
   is_active        Boolean @default(true)
-  external_id      String? @db.VarChar(255) @unique // Firebase UID
   
   // Relationship to Clinic (Staff)
   clinic_id        Int?
@@ -67,14 +83,11 @@ model Dentist {
 
 model Patient {
   id               Int     @id @default(autoincrement())
-  firstname        String  @db.VarChar(100)
-  lastname         String  @db.VarChar(100)
-  national_id      String? @db.VarChar(50) @unique
+  user_id          Int?    @unique
+  user             User?   @relation(fields: [user_id], references: [id])
   cpf              String? @db.VarChar(14) @unique
   birthdate        DateTime @db.Date // Use Date type for birthdate
   civil_state      String? @db.VarChar(50) // e.g., Single, Married, Divorced, Widowed
-  email_contact    String? @db.VarChar(255)
-  number_contact   String  @db.VarChar(20)
 
   // Relationships
   appointments     Appointment[]

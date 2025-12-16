@@ -7,18 +7,39 @@ enum DentistRole {
   hired
 }
 
-type Dentist {
+enum UserRole {
+  dentist
+  patient
+}
+
+type User {
   id: String!
+  external_id: String
+  email: Email!
   firstname: String!
   lastname: String!
   phone_number: String!
-  email: Email!
+  role: UserRole!
+}
+
+type Dentist {
+  id: String!
+  user_id: String!
+  user: User!
   cro_number: String!
   specialization: String!
   role: String!
   is_active: Boolean!
   clinic_id: String
-  external_id: String
+}
+
+type Patient {
+  id: String!
+  user_id: String
+  user: User
+  cpf: String
+  birthdate: DateTime!
+  civil_state: String
 }
 
 input CreateDentistInput {
@@ -46,10 +67,30 @@ input UpdateDentistInput {
   clinic_id: String
 }
 
+input CreatePatientInput {
+  email: Email
+  firstname: String
+  lastname: String
+  phone_number: String
+  cpf: String!
+  birthdate: DateTime!
+  civil_state: String
+}
+
+input UpdatePatientInput {
+  cpf: String
+  birthdate: DateTime
+  civil_state: String
+}
+
 type Query {
   _empty: String
   getDentistById(id: String!): Dentist!
   getDentistByEmail(email: Email!): Dentist!
+  getPatientById(id: String!): Patient!
+  getPatientByCpf(cpf: String!): Patient!
+  getPatientByEmail(email: Email!): Patient!
+  getAllPatients(limit: Int, offset: Int): [Patient!]!
 }
 
 type Mutation {
@@ -57,4 +98,7 @@ type Mutation {
   createDentist(input: CreateDentistInput!): Dentist!
   updateDentist(id: String!, input: UpdateDentistInput!): Dentist!
   deleteDentist(id: String!): Dentist!
+  createPatient(input: CreatePatientInput!): Patient!
+  updatePatient(id: String!, input: UpdatePatientInput!): Patient!
+  deletePatient(id: String!): Patient!
 }

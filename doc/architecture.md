@@ -43,6 +43,7 @@ The application is structured in the following layers (from outer to inner):
 ## Component Overview
 
 ### 1. **GraphQL Layer** (`src/graphql/`)
+
 - **Purpose**: Entry point for all API requests
 - **Responsibilities**:
   - Define GraphQL schema and types
@@ -55,6 +56,7 @@ The application is structured in the following layers (from outer to inner):
   - `errors/`: Error formatting and logging
 
 ### 2. **Entities** (`src/entities/`)
+
 - **Purpose**: Domain models and business rules
 - **Responsibilities**:
   - Define domain entities (types/interfaces)
@@ -67,6 +69,7 @@ The application is structured in the following layers (from outer to inner):
   - Business logic validation rules
 
 ### 3. **Use Cases** (`src/usecases/`)
+
 - **Purpose**: Business logic and orchestration
 - **Responsibilities**:
   - Implement business rules
@@ -79,6 +82,7 @@ The application is structured in the following layers (from outer to inner):
   - Pure business logic, no infrastructure concerns
 
 ### 4. **Repositories** (`src/repositories/`)
+
 - **Purpose**: Data access abstraction
 - **Responsibilities**:
   - Abstract database operations
@@ -91,6 +95,7 @@ The application is structured in the following layers (from outer to inner):
   - Initialized with database client (Prisma)
 
 ### 5. **Gateways** (`src/gateways/`)
+
 - **Purpose**: External service integration
 - **Responsibilities**:
   - Integrate with external APIs (e.g., Firebase IAM)
@@ -101,6 +106,7 @@ The application is structured in the following layers (from outer to inner):
   - Error translation to domain errors
 
 ### 6. **Context** (`src/libs/context.ts`)
+
 - **Purpose**: Dependency injection container
 - **Responsibilities**:
   - Provide application-wide dependencies
@@ -142,6 +148,7 @@ The application is structured in the following layers (from outer to inner):
 ### Response Flow
 
 The response flows back through the same layers in reverse:
+
 - Repository returns entity
 - Use case returns entity
 - GraphQL resolver returns entity (mapped to GraphQL type)
@@ -149,26 +156,31 @@ The response flows back through the same layers in reverse:
 ## Key Principles
 
 ### 1. **Dependency Inversion**
+
 - Inner layers (entities, use cases) don't depend on outer layers
 - Dependencies are injected via `AppContext`
 - Interfaces are defined in inner layers
 
 ### 2. **Separation of Concerns**
+
 - Each layer has a single, well-defined responsibility
 - Business logic is isolated from infrastructure
 - Data access is abstracted from business logic
 
 ### 3. **Type Safety**
+
 - Full TypeScript type coverage
 - GraphQL types generated from schema
 - Type-safe entity mappings
 
 ### 4. **Error Handling**
+
 - Custom error types in entities layer
 - Errors flow up through layers
 - GraphQL error formatter handles presentation
 
 ### 5. **Testability**
+
 - Pure functions in use cases
 - Mockable dependencies via context
 - Isolated business logic
@@ -205,10 +217,10 @@ When adding a new domain (e.g., `Patient`, `Appointment`), follow this structure
 5. **Resolvers**: Create GraphQL resolvers in `src/graphql/resolvers/[domain]/`
 
 See individual component documentation for detailed guidelines:
+
 - [Entities Guide](./entities.md)
 - [Repositories Guide](./repositories.md)
 - [Use Cases Guide](./usecases.md)
 - [GraphQL Guide](./graphql.md)
 - [Context Guide](./context.md)
 - [Gateways Guide](./gateways.md)
-

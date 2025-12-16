@@ -9,6 +9,7 @@ The GraphQL layer is the entry point for all API requests. It handles GraphQL qu
 ## Location
 
 GraphQL files are located in `src/graphql/`:
+
 - Schema: `src/graphql/schema.graphql`
 - Resolvers: `src/graphql/resolvers/[domain]/`
 - Generated types: `src/graphql/__generated__/resolvers-types.ts`
@@ -93,6 +94,7 @@ type Mutation {
 ```
 
 **Guidelines:**
+
 - Use `!` for required fields
 - Use custom scalars (Email, DateTime) when appropriate
 - Match enum values with TypeScript enums
@@ -143,6 +145,7 @@ export const initDentistResolvers = (usecases: Usecases): DentistResolvers => ({
 ```
 
 **Guidelines:**
+
 - Create resolvers for all fields in the type
 - Use simple pass-through for entity fields
 - The `parent` parameter is the entity returned from use cases
@@ -183,6 +186,7 @@ export const initDentistQueryResolvers = (
 ```
 
 **Guidelines:**
+
 - Use generated argument types
 - Pass `AppContext` to use cases
 - Return domain entities (they match GraphQL types)
@@ -259,6 +263,7 @@ export const initDentistMutationResolvers = (
 ```
 
 **Guidelines:**
+
 - Transform GraphQL input to entity input
 - Handle null/undefined conversions
 - Use conditional spread for optional fields
@@ -287,6 +292,7 @@ export const initDentistModuleResolvers = (usecases: Usecases): Resolvers => {
 ```
 
 **Guidelines:**
+
 - Combine all resolvers for the domain
 - Return partial `Resolvers` type
 - Export for use in main resolvers index
@@ -320,6 +326,7 @@ export const initResolvers = (usecases: Usecases): Resolvers => {
 ```
 
 **Guidelines:**
+
 - Combine all domain resolvers
 - Include scalar resolvers
 - Merge Query and Mutation from all domains
@@ -402,26 +409,31 @@ export const initScalars = (): Pick<Resolvers, 'Email' | 'DateTime'> => {
 ## Best Practices
 
 ### 1. **Type Safety**
+
 - Use generated types from GraphQL Code Generator
 - Use `Pick` to type partial resolvers
 - Match GraphQL types with entity types
 
 ### 2. **Input Transformation**
+
 - Transform GraphQL inputs to entity inputs
 - Handle null/undefined conversions
 - Map enum values correctly
 
 ### 3. **Error Handling**
+
 - Let errors bubble up from use cases
 - GraphQL error formatter handles presentation
 - Don't catch errors unless transforming
 
 ### 4. **Context Usage**
+
 - Always pass `AppContext` to use cases
 - Access auth, logger, config via context
 - Don't access repositories/gateways directly
 
 ### 5. **Field Resolvers**
+
 - Use simple pass-through for entity fields
 - Add computed fields if needed
 - Keep resolvers thin (delegate to use cases)
@@ -431,6 +443,7 @@ export const initScalars = (): Pick<Resolvers, 'Email' | 'DateTime'> => {
 ### Step-by-Step Example: Creating a `Patient` GraphQL Module
 
 1. **Update schema (`schema.graphql`):**
+
    ```graphql
    type Patient {
      id: String!
@@ -461,21 +474,26 @@ export const initScalars = (): Pick<Resolvers, 'Email' | 'DateTime'> => {
    ```
 
 2. **Generate types:**
+
    ```bash
    npm run codegen
    ```
 
 3. **Create resolvers directory:**
+
    ```bash
    mkdir -p src/graphql/resolvers/patient
    ```
 
 4. **Create type resolvers (`patient.ts`):**
+
    ```typescript
    import { Usecases } from '../../../usecases';
    import { PatientResolvers } from '../../__generated__/resolvers-types';
 
-   export const initPatientResolvers = (usecases: Usecases): PatientResolvers => ({
+   export const initPatientResolvers = (
+     usecases: Usecases,
+   ): PatientResolvers => ({
      id: (parent) => parent.id,
      firstname: (parent) => parent.firstname,
      // ... other fields
@@ -483,6 +501,7 @@ export const initScalars = (): Pick<Resolvers, 'Email' | 'DateTime'> => {
    ```
 
 5. **Create query resolvers (`patient-query.ts`):**
+
    ```typescript
    import { AppContext } from '../../../libs/context';
    import { Usecases } from '../../../usecases';
@@ -500,6 +519,7 @@ export const initScalars = (): Pick<Resolvers, 'Email' | 'DateTime'> => {
    ```
 
 6. **Create mutation resolvers (`patient-mutation.ts`):**
+
    ```typescript
    import { AppContext } from '../../../libs/context';
    import { Usecases } from '../../../usecases';
@@ -520,6 +540,7 @@ export const initScalars = (): Pick<Resolvers, 'Email' | 'DateTime'> => {
    ```
 
 7. **Create module index (`index.ts`):**
+
    ```typescript
    import { Usecases } from '../../../usecases';
    import { Resolvers } from '../../__generated__/resolvers-types';
@@ -527,7 +548,9 @@ export const initScalars = (): Pick<Resolvers, 'Email' | 'DateTime'> => {
    import { initPatientQueryResolvers } from './patient-query';
    import { initPatientMutationResolvers } from './patient-mutation';
 
-   export const initPatientModuleResolvers = (usecases: Usecases): Resolvers => {
+   export const initPatientModuleResolvers = (
+     usecases: Usecases,
+   ): Resolvers => {
      return {
        Query: {
          ...initPatientQueryResolvers(usecases),
@@ -541,6 +564,7 @@ export const initScalars = (): Pick<Resolvers, 'Email' | 'DateTime'> => {
    ```
 
 8. **Update main resolvers index:**
+
    ```typescript
    import { initPatientModuleResolvers } from './patient';
    // ... other domains
@@ -620,6 +644,3 @@ export const errorFormatter = (error: GraphQLError) => {
 - Test input transformation
 - Test error cases
 - Use GraphQL test utilities if available
-
-
-

@@ -7,13 +7,9 @@ export const mapToPrismaCreateData = (
   data: CreateDentistData,
 ): Prisma.DentistUncheckedCreateInput => {
   const prismaData: Prisma.DentistUncheckedCreateInput = {
-    firstname: data.firstname,
-    lastname: data.lastname,
-    phone_number: data.phone_number,
-    email: data.email,
+    user_id: data.user_id,
     cro_number: data.cro_number,
     is_active: data.is_active ?? true,
-    external_id: data.external_id ?? null,
     // Default values: role defaults to Owner, specialization defaults to generalist
     specialization:
       data.specialization && data.specialization !== ''

@@ -77,6 +77,7 @@ export type IAMGateway = ReturnType<typeof initIAMGateway>;
 ## Guidelines
 
 ### 1. **Error Translation**
+
 - Always translate external service errors to domain errors
 - Map error codes to appropriate domain error types
 - Provide context in error messages
@@ -100,6 +101,7 @@ try {
 ```
 
 ### 2. **Type Safety**
+
 - Return domain types, not external service types
 - Use entity types when appropriate
 - Export gateway type for use in context
@@ -115,6 +117,7 @@ export type IAMGateway = ReturnType<typeof initIAMGateway>;
 ```
 
 ### 3. **Initialization**
+
 - Accept `Config` as parameter
 - Initialize external service clients
 - Return object with all gateway methods
@@ -135,6 +138,7 @@ export const initIAMGateway = (config: Config) => {
 ```
 
 ### 4. **Configuration**
+
 - Access configuration via parameter
 - Don't import config directly
 - Keep configuration structure consistent
@@ -190,7 +194,11 @@ export const initIAMGateway = (config: Config) => {
     } catch (err: any) {
       switch (err.code) {
         case 'auth/id-token-expired':
-          throw new UnauthorizedError('Access token expired', undefined, err.stack);
+          throw new UnauthorizedError(
+            'Access token expired',
+            undefined,
+            err.stack,
+          );
         default:
           throw new UnknownError(err.message, undefined, err.stack);
       }
@@ -229,7 +237,11 @@ export const initEmailGateway = (config: Config) => {
       });
     } catch (err: any) {
       if (err.code === 'INVALID_EMAIL') {
-        throw new BadRequestError('Invalid email address', { email: to }, err.stack);
+        throw new BadRequestError(
+          'Invalid email address',
+          { email: to },
+          err.stack,
+        );
       }
       throw new UnknownError(err.message, { email: to }, err.stack);
     }
@@ -272,10 +284,18 @@ export const initPaymentGateway = (config: Config) => {
       };
     } catch (err: any) {
       if (err.code === 'INSUFFICIENT_FUNDS') {
-        throw new BusinessError('Insufficient funds', { amount, currency }, err.stack);
+        throw new BusinessError(
+          'Insufficient funds',
+          { amount, currency },
+          err.stack,
+        );
       }
       if (err.code === 'INVALID_PAYMENT_METHOD') {
-        throw new BadRequestError('Invalid payment method', { paymentMethodId }, err.stack);
+        throw new BadRequestError(
+          'Invalid payment method',
+          { paymentMethodId },
+          err.stack,
+        );
       }
       throw new UnknownError(err.message, undefined, err.stack);
     }
@@ -292,29 +312,34 @@ export type PaymentGateway = ReturnType<typeof initPaymentGateway>;
 ## Best Practices
 
 ### 1. **Error Handling**
+
 - Always translate external errors to domain errors
 - Provide context in error messages
 - Preserve stack traces for debugging
 - Use appropriate error types (NotFoundError, BadRequestError, etc.)
 
 ### 2. **Type Safety**
+
 - Return domain types, not external service types
 - Export gateway type for use in context
 - Use TypeScript types consistently
 
 ### 3. **Initialization**
+
 - Use factory pattern
 - Accept config as parameter
 - Initialize external clients once
 - Return object with all methods
 
 ### 4. **Testing**
+
 - Mock external service clients
 - Test error translation
 - Test all error cases
 - Verify correct error types are thrown
 
 ### 5. **Separation of Concerns**
+
 - Keep gateway focused on external service integration
 - Don't include business logic (that's in use cases)
 - Don't access repositories directly (use context)
@@ -324,6 +349,7 @@ export type PaymentGateway = ReturnType<typeof initPaymentGateway>;
 ### Step-by-Step Example: Creating an Email Gateway
 
 1. **Create gateway file (`email-gateway.ts`):**
+
    ```typescript
    import { Config } from '../libs/config';
    import { UnknownError } from '../entities/errors/unknown-error';
@@ -357,6 +383,7 @@ export type PaymentGateway = ReturnType<typeof initPaymentGateway>;
    ```
 
 2. **Update Gateways type:**
+
    ```typescript
    // src/libs/context.ts
    import { EmailGateway } from '../gateways/email-gateway';
@@ -368,6 +395,7 @@ export type PaymentGateway = ReturnType<typeof initPaymentGateway>;
    ```
 
 3. **Initialize and provide in context:**
+
    ```typescript
    // src/graphql/index.ts
    import { initEmailGateway } from '../gateways/email-gateway';
@@ -435,6 +463,3 @@ throw new UnknownError('Unknown error', undefined, err.stack);
 - Provide clean interface for use cases
 - Keep business logic out of gateways
 - Test error translation thoroughly
-
-
-

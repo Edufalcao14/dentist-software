@@ -4,17 +4,25 @@ import { mapToEntity } from './mapper/map-to-entity';
 
 export const initGetDentistByEmailRepository = (db: PrismaClient) => {
   return async (email: string): Promise<DentistEntity | null> => {
-    const dentist = await db.dentist.findFirst({
+    const user = await db.user.findFirst({
       where: {
         email,
+        role: 'dentist',
         deleted_at: null,
+      },
+      include: {
+        dentist: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
 
-    if (!dentist) {
+    if (!user || !user.dentist || user.dentist.deleted_at) {
       return null;
     }
 
-    return mapToEntity(dentist);
+    return mapToEntity(user.dentist);
   };
 };

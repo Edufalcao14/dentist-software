@@ -11,6 +11,9 @@ export const initSoftDeleteDentistRepository = (db: PrismaClient) => {
       data: {
         deleted_at: new Date(),
       },
+      include: {
+        user: true,
+      },
     });
 
     return mapToEntity(dentist);

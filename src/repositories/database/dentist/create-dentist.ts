@@ -10,7 +10,14 @@ export const initCreateDentistRepository = (db: PrismaClient) => {
 
     const dentist = await db.dentist.create({
       data: prismaData,
+      include: {
+        user: true,
+      },
     });
+
+    if (!dentist.user) {
+      throw new Error('User not found for dentist');
+    }
 
     return mapToEntity(dentist);
   };

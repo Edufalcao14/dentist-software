@@ -8,6 +8,9 @@ export const initGetAllDentistsRepository = (db: PrismaClient) => {
       where: {
         deleted_at: null,
       },
+      include: {
+        user: true,
+      },
       orderBy: {
         created_at: 'desc',
       },

@@ -97,6 +97,7 @@ function validateInput(input: CreateDentistInput) {
 ```
 
 **Guidelines:**
+
 - Always validate input first
 - Use validation library (Yup, Zod, etc.)
 - Throw domain errors (BadUserInputError, etc.)
@@ -119,6 +120,7 @@ export const getDentistById = async (
 ```
 
 **Guidelines:**
+
 - Simple pass-through for read operations
 - Add authorization checks if needed
 - Let repository handle NotFoundError
@@ -172,6 +174,7 @@ function validateInput(input: UpdateDentistInput) {
 ```
 
 **Guidelines:**
+
 - Validate only provided fields for updates
 - Check existence before updating
 - Handle partial updates
@@ -196,6 +199,7 @@ export const deleteDentist = async (
 ```
 
 **Guidelines:**
+
 - Use soft delete pattern
 - Check existence before deleting
 - Consider cascading deletes for related entities
@@ -226,6 +230,7 @@ export type DentistUsecases = ReturnType<typeof initDentistUsecases>;
 ```
 
 **Guidelines:**
+
 - Export all use case functions
 - Use factory pattern: `init[Domain]Usecases`
 - Return an object with all operations
@@ -234,34 +239,40 @@ export type DentistUsecases = ReturnType<typeof initDentistUsecases>;
 ## Best Practices
 
 ### 1. **Input Validation**
+
 - Always validate inputs using schemas
 - Use validation libraries (Yup, Zod)
 - Provide clear error messages
 - Validate early (fail fast)
 
 ### 2. **Error Handling**
+
 - Throw domain errors (BadUserInputError, NotFoundError, etc.)
 - Don't expose internal errors
 - Provide context in error messages
 - Let errors bubble up (don't catch unless transforming)
 
 ### 3. **Orchestration**
+
 - Coordinate between repositories and gateways
 - Handle transactions if needed
 - Maintain consistency across systems
 
 ### 4. **Business Rules**
+
 - Enforce business rules in use cases
 - Don't put business logic in repositories
 - Keep rules explicit and testable
 
 ### 5. **Dependencies**
+
 - Receive `AppContext` as first parameter
 - Access repositories via `context.repositories`
 - Access gateways via `context.gateways`
 - Access logger via `context.logger`
 
 ### 6. **Return Types**
+
 - Always return domain entities
 - Don't return database models
 - Keep return types consistent
@@ -330,11 +341,13 @@ clinic_id: yup
 ### Step-by-Step Example: Creating a `Patient` Use Case
 
 1. **Create directory structure:**
+
    ```bash
    mkdir -p src/usecases/patient
    ```
 
 2. **Create use case (`create-patient.logic.ts`):**
+
    ```typescript
    import { AppContext } from '../../libs/context';
    import { CreatePatientInput } from '../../entities/patient/create-patient-input';
@@ -378,6 +391,7 @@ clinic_id: yup
    ```
 
 3. **Create index file (`index.ts`):**
+
    ```typescript
    import { createPatient } from './create-patient.logic';
    // ... import other use cases
@@ -393,6 +407,7 @@ clinic_id: yup
    ```
 
 4. **Register in main use cases index:**
+
    ```typescript
    // src/usecases/index.ts
    import { initPatientUsecases } from './patient';
@@ -488,4 +503,3 @@ export const createDentistWithClinic = async (
 - Test business rules
 - Test error cases
 - Test orchestration flows
-

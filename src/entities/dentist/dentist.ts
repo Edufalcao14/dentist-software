@@ -1,16 +1,14 @@
 import { DentistRole } from './dentist-role';
 import { DentistSpecialization } from './dentist-specialization';
+import { UserEntity } from '../user/user';
 
 export type DentistEntity = {
   id: string;
-  firstname: string;
-  lastname: string;
-  phone_number: string;
-  email: string;
+  user_id: string;
+  user: UserEntity;
   cro_number: string;
   specialization: DentistSpecialization;
   role: DentistRole;
   is_active: boolean;
   clinic_id: string | null;
-  external_id: string | null;
 };

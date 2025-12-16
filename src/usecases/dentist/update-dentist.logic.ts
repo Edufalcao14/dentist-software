@@ -27,20 +27,54 @@ export const updateDentist = async (
     throw new NotFoundError('Dentist not found', { id });
   }
 
+  // Update User if email, firstname, lastname, or phone_number change
+  const userUpdates: {
+    email?: string;
+    firstname?: string;
+    lastname?: string;
+    phone_number?: string;
+  } = {};
+
+  if (input.email !== undefined && input.email !== existingDentist.user.email) {
+    userUpdates.email = input.email;
+  }
+
+  if (
+    input.firstname !== undefined &&
+    input.firstname !== existingDentist.user.firstname
+  ) {
+    userUpdates.firstname = input.firstname;
+  }
+
+  if (
+    input.lastname !== undefined &&
+    input.lastname !== existingDentist.user.lastname
+  ) {
+    userUpdates.lastname = input.lastname;
+  }
+
+  if (
+    input.phone_number !== undefined &&
+    input.phone_number !== existingDentist.user.phone_number
+  ) {
+    userUpdates.phone_number = input.phone_number;
+  }
+
   // If email or name changes, update Firebase user
-  if (existingDentist.external_id) {
+  if (existingDentist.user.external_id && Object.keys(userUpdates).length > 0) {
     const firebaseUpdates: {
       email?: string;
       displayName?: string;
     } = {};
 
-    if (input.email !== undefined && input.email !== existingDentist.email) {
-      firebaseUpdates.email = input.email;
+    if (userUpdates.email) {
+      firebaseUpdates.email = userUpdates.email;
     }
 
-    const newFirstname = input.firstname ?? existingDentist.firstname;
-    const newLastname = input.lastname ?? existingDentist.lastname;
-    const currentDisplayName = `${existingDentist.firstname} ${existingDentist.lastname}`;
+    const newFirstname =
+      userUpdates.firstname ?? existingDentist.user.firstname;
+    const newLastname = userUpdates.lastname ?? existingDentist.user.lastname;
+    const currentDisplayName = `${existingDentist.user.firstname} ${existingDentist.user.lastname}`;
     const newDisplayName = `${newFirstname} ${newLastname}`;
 
     if (newDisplayName !== currentDisplayName) {
@@ -49,29 +83,26 @@ export const updateDentist = async (
 
     if (Object.keys(firebaseUpdates).length > 0) {
       await context.gateways.iam.updateUser(
-        existingDentist.external_id,
+        existingDentist.user.external_id,
         firebaseUpdates,
       );
     }
+
+    // Update User in database
+    await context.repositories.user.update(
+      parseInt(existingDentist.user_id, 10),
+      userUpdates,
+    );
   }
 
+  // Update Dentist-specific fields
   const updateData: {
-    firstname?: string;
-    lastname?: string;
-    phone_number?: string;
-    email?: string;
     cro_number?: string;
     specialization?: string | null;
     role?: string | null;
     is_active?: boolean;
     clinic_id?: number | null;
   } = {
-    ...(input.firstname !== undefined && { firstname: input.firstname }),
-    ...(input.lastname !== undefined && { lastname: input.lastname }),
-    ...(input.phone_number !== undefined && {
-      phone_number: input.phone_number,
-    }),
-    ...(input.email !== undefined && { email: input.email }),
     ...(input.cro_number !== undefined && { cro_number: input.cro_number }),
     ...(input.specialization !== undefined && {
       specialization: input.specialization,

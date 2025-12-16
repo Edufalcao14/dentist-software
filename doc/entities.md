@@ -47,6 +47,7 @@ export type DentistEntity = {
 ```
 
 **Guidelines:**
+
 - Use `type` for entity definitions
 - Use descriptive property names (snake_case is acceptable if matching database)
 - Use `null` for optional fields that can be explicitly null
@@ -71,6 +72,7 @@ export type CreateDentistInput = {
 ```
 
 **Guidelines:**
+
 - Create separate input types for different operations (create, update)
 - Use `string | null` for optional enum fields (will be validated in use case)
 - Include fields needed for the operation (e.g., `password` for creation)
@@ -96,6 +98,7 @@ export enum DentistSpecialization {
 ```
 
 **Guidelines:**
+
 - Use `enum` for fixed sets of values
 - Use descriptive constant names (UPPER_SNAKE_CASE)
 - Map to string values that match database/GraphQL schema
@@ -120,6 +123,7 @@ export class BadUserInputError extends Error {
 ```
 
 **Available Error Types:**
+
 - `BadRequestError`: General bad request
 - `BadUserInputError`: Invalid user input
 - `NotFoundError`: Resource not found
@@ -139,25 +143,30 @@ export * from './dentist-specialization';
 ## Best Practices
 
 ### 1. **Keep Entities Pure**
+
 - No dependencies on external libraries
 - No database-specific types (use Prisma types only in repositories)
 - No business logic (validation happens in use cases)
 
 ### 2. **Use Descriptive Types**
+
 - Prefer explicit types over `any`
 - Use union types for constrained values
 - Use `null` vs `undefined` consistently
 
 ### 3. **Naming Conventions**
+
 - Entity types: `[Domain]Entity` (e.g., `DentistEntity`)
 - Input types: `Create[Domain]Input`, `Update[Domain]Input`
 - Enums: `[Domain][Property]` (e.g., `DentistRole`)
 
 ### 4. **ID Fields**
+
 - Use `string` for IDs (even if database uses integers)
 - Conversion happens in repository mappers
 
 ### 5. **Nullable Fields**
+
 - Use `| null` for fields that can be explicitly null
 - Use `?` for optional fields that may be undefined
 - Be consistent within a domain
@@ -167,11 +176,13 @@ export * from './dentist-specialization';
 ### Step-by-Step Example: Creating a `Patient` Entity
 
 1. **Create directory structure:**
+
    ```bash
    mkdir -p src/entities/patient
    ```
 
 2. **Create main entity (`patient.ts`):**
+
    ```typescript
    export type PatientEntity = {
      id: string;
@@ -186,6 +197,7 @@ export * from './dentist-specialization';
    ```
 
 3. **Create input types (`create-patient-input.ts`):**
+
    ```typescript
    export type CreatePatientInput = {
      firstname: string;
@@ -198,6 +210,7 @@ export * from './dentist-specialization';
    ```
 
 4. **Create index file (`index.ts`):**
+
    ```typescript
    export * from './patient';
    export * from './create-patient-input';
@@ -212,25 +225,26 @@ export * from './dentist-specialization';
 ## Common Patterns
 
 ### Date/Time Fields
+
 - Use `string` for dates (ISO format)
 - Conversion to/from Date objects happens in repositories
 
 ### Relationships
+
 - Use `string | null` for foreign key IDs
 - Avoid nested objects in entities (fetch separately if needed)
 
 ### Enums
+
 - Always create TypeScript enums
 - Map enum values to match GraphQL schema and database
 
 ## Validation
 
 Entity types don't include validation logic. Validation happens in:
+
 - **Use Cases**: Business rule validation (using Yup, Zod, etc.)
 - **GraphQL Schema**: Type constraints
 - **Database**: Schema constraints
 
 Entities define the **shape** of data, not the **rules**.
-
-
-

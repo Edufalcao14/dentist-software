@@ -1,15 +1,18 @@
-import { Dentist } from '@prisma/client';
+import { Dentist, User } from '@prisma/client';
 import { DentistEntity } from '../../../../entities/dentist/dentist';
 import { DentistRole } from '../../../../entities/dentist/dentist-role';
 import { DentistSpecialization } from '../../../../entities/dentist/dentist-specialization';
+import { mapToEntity as mapUserToEntity } from '../../user/mapper/map-to-entity';
 
-export const mapToEntity = (dentist: Dentist): DentistEntity => {
+type DentistWithUser = Dentist & {
+  user: User;
+};
+
+export const mapToEntity = (dentist: DentistWithUser): DentistEntity => {
   return {
     id: dentist.id.toString(),
-    firstname: dentist.firstname,
-    lastname: dentist.lastname,
-    phone_number: dentist.phone_number,
-    email: dentist.email,
+    user_id: dentist.user_id.toString(),
+    user: mapUserToEntity(dentist.user),
     cro_number: dentist.cro_number,
     specialization:
       (dentist.specialization as DentistSpecialization) ||
@@ -17,6 +20,5 @@ export const mapToEntity = (dentist: Dentist): DentistEntity => {
     role: (dentist.role as DentistRole) || DentistRole.ADMIN,
     is_active: dentist.is_active,
     clinic_id: dentist.clinic_id?.toString() ?? null,
-    external_id: dentist.external_id ?? null,
   };
 };

@@ -54,6 +54,7 @@ export const initCreateDentistRepository = (db: PrismaClient) => {
 ```
 
 **Guidelines:**
+
 - Use factory pattern: `init[Operation][Domain]Repository`
 - Accept `PrismaClient` as parameter
 - Return a function that accepts domain data
@@ -88,6 +89,7 @@ export type UpdateDentistData = Omit<
 ```
 
 **Guidelines:**
+
 - Extend Prisma types when possible
 - Override fields that need custom handling (enums, IDs)
 - Use Prisma's update operation types for updates
@@ -121,6 +123,7 @@ export const mapToEntity = (dentist: Dentist): DentistEntity => {
 ```
 
 **Guidelines:**
+
 - Convert database types to entity types
 - Convert integer IDs to strings
 - Handle null/undefined conversions
@@ -152,6 +155,7 @@ export const mapToPrismaCreateData = (
 ```
 
 **Guidelines:**
+
 - Convert entity types to Prisma types
 - Handle optional fields with conditional spread
 - Convert string IDs to integers if needed
@@ -182,6 +186,7 @@ export const initGetDentistByIdRepository = (db: PrismaClient) => {
 ```
 
 **Guidelines:**
+
 - Convert string IDs to integers for database queries
 - Throw `NotFoundError` when entity doesn't exist
 - Always map to entity before returning
@@ -214,6 +219,7 @@ export const initUpdateDentistRepository = (db: PrismaClient) => {
 ```
 
 **Guidelines:**
+
 - Handle partial updates (only update provided fields)
 - Throw `NotFoundError` if entity doesn't exist
 - Use Prisma's update operation types
@@ -239,6 +245,7 @@ export const initSoftDeleteDentistRepository = (db: PrismaClient) => {
 ```
 
 **Guidelines:**
+
 - Use soft delete pattern (set `deleted_at` timestamp)
 - Consider adding `deleted_at` filter to get operations
 - Return the updated entity
@@ -271,6 +278,7 @@ export type DentistRepositories = ReturnType<typeof initDentistRepositories>;
 ```
 
 **Guidelines:**
+
 - Export all repository functions
 - Export types for use in use cases
 - Use factory pattern: `init[Domain]Repositories`
@@ -279,26 +287,31 @@ export type DentistRepositories = ReturnType<typeof initDentistRepositories>;
 ## Best Practices
 
 ### 1. **Always Use Mappers**
+
 - Never return Prisma models directly
 - Always convert to domain entities
 - Keep mapping logic in separate files
 
 ### 2. **Error Handling**
+
 - Throw domain errors (NotFoundError, etc.)
 - Don't expose database-specific errors
 - Provide context in error messages
 
 ### 3. **ID Conversion**
+
 - Convert string IDs (from entities) to integers (for Prisma)
 - Convert integer IDs (from Prisma) to strings (for entities)
 - Handle conversion in mappers
 
 ### 4. **Type Safety**
+
 - Use Prisma types for database operations
 - Use entity types for return values
 - Create repository-specific types for inputs
 
 ### 5. **Factory Pattern**
+
 - All repositories use factory functions
 - Accept `PrismaClient` as parameter
 - Return configured functions
@@ -308,11 +321,13 @@ export type DentistRepositories = ReturnType<typeof initDentistRepositories>;
 ### Step-by-Step Example: Creating a `Patient` Repository
 
 1. **Create directory structure:**
+
    ```bash
    mkdir -p src/repositories/database/patient/mapper
    ```
 
 2. **Create types (`types.ts`):**
+
    ```typescript
    import { Prisma } from '@prisma/client';
 
@@ -321,6 +336,7 @@ export type DentistRepositories = ReturnType<typeof initDentistRepositories>;
    ```
 
 3. **Create mappers:**
+
    ```typescript
    // mapper/map-to-entity.ts
    import { Patient } from '@prisma/client';
@@ -336,6 +352,7 @@ export type DentistRepositories = ReturnType<typeof initDentistRepositories>;
    ```
 
 4. **Create operations (e.g., `create-patient.ts`):**
+
    ```typescript
    import { PrismaClient } from '@prisma/client';
    import { PatientEntity } from '../../../entities/patient/patient';
@@ -353,6 +370,7 @@ export type DentistRepositories = ReturnType<typeof initDentistRepositories>;
    ```
 
 5. **Create index file (`index.ts`):**
+
    ```typescript
    import { PrismaClient } from '@prisma/client';
    import { initCreatePatientRepository } from './create-patient';
@@ -367,6 +385,7 @@ export type DentistRepositories = ReturnType<typeof initDentistRepositories>;
    ```
 
 6. **Register in main repositories index:**
+
    ```typescript
    // src/repositories/database/index.ts
    import { initPatientRepositories } from './patient';
@@ -384,6 +403,7 @@ export type DentistRepositories = ReturnType<typeof initDentistRepositories>;
 ## Common Patterns
 
 ### Filtering and Pagination
+
 ```typescript
 export const initGetAllDentistsRepository = (db: PrismaClient) => {
   return async (filters?: {
@@ -408,6 +428,7 @@ export const initGetAllDentistsRepository = (db: PrismaClient) => {
 ```
 
 ### Relationships
+
 ```typescript
 // Include related data when needed
 const dentist = await db.dentist.findUnique({
@@ -424,4 +445,3 @@ const dentist = await db.dentist.findUnique({
 - Test mappers separately
 - Test error cases (not found, etc.)
 - Verify ID conversions
-

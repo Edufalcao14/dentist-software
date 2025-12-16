@@ -21,6 +21,7 @@ services:
       - FIREBASE_APP_ID=${FIREBASE_APP_ID}
     volumes:
       - ./src:/usr/src/app/src
+      - ./prisma:/usr/src/app/prisma
       - /usr/src/app/node_modules
     depends_on:
       - db

@@ -1,21 +1,23 @@
-import { Usecases } from '../../../usecases';
-import { DentistResolvers } from '../../__generated__/resolvers-types';
-//eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const initDentistResolvers = (usecases: Usecases): DentistResolvers => ({
+import {
+  DentistResolvers,
+  UserRole as GraphQLUserRole,
+} from '../../__generated__/resolvers-types';
+
+export const initDentistResolvers = (): DentistResolvers => ({
   id: (parent) => {
     return parent.id;
   },
-  firstname: (parent) => {
-    return parent.firstname;
+  user_id: (parent) => {
+    return parent.user_id;
   },
-  lastname: (parent) => {
-    return parent.lastname;
-  },
-  phone_number: (parent) => {
-    return parent.phone_number;
-  },
-  email: (parent) => {
-    return parent.email;
+  user: (parent) => {
+    return {
+      ...parent.user,
+      role:
+        parent.user.role === 'dentist'
+          ? GraphQLUserRole.Dentist
+          : GraphQLUserRole.Patient,
+    };
   },
   cro_number: (parent) => {
     return parent.cro_number;
@@ -31,8 +33,5 @@ export const initDentistResolvers = (usecases: Usecases): DentistResolvers => ({
   },
   clinic_id: (parent) => {
     return parent.clinic_id;
-  },
-  external_id: (parent) => {
-    return parent.external_id;
   },
 });

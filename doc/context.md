@@ -25,6 +25,7 @@ export type AppContext = {
 ```
 
 **Components:**
+
 - `config`: Application configuration
 - `logger`: Bunyan logger instance
 - `repositories`: All database repositories
@@ -56,6 +57,7 @@ export type AuthContext = AuthContextAuthenticated | AuthContextUnauthenticated;
 ```
 
 **Usage:**
+
 - Check authentication: `if (context.auth.isAuthenticated) { ... }`
 - Access user ID: `context.auth.externalId`
 - Check impersonation: `if (context.auth.isImpersonating) { ... }`
@@ -71,7 +73,7 @@ expressMiddleware(server, {
     // Extract auth token
     let auth: AuthContext = { isAuthenticated: false };
     let authHeader = req.headers.authorization;
-    
+
     if (authHeader && operationName !== 'IntrospectionQuery') {
       authHeader = authHeader.replace(/^bearer /gim, '');
       try {
@@ -164,6 +166,7 @@ return {
 ```
 
 **Access Pattern:**
+
 ```typescript
 // In use case
 await context.repositories.dentist.create(data);
@@ -199,6 +202,7 @@ return {
 ```
 
 **Access Pattern:**
+
 ```typescript
 // In use case
 await context.gateways.iam.createUser(email, password, displayName);
@@ -209,6 +213,7 @@ await context.gateways.iam.createUser(email, password, displayName);
 ### Adding a New Repository
 
 1. **Create repository initialization:**
+
    ```typescript
    // src/repositories/database/patient/index.ts
    export const initPatientRepositories = (db: PrismaClient) => {
@@ -220,6 +225,7 @@ await context.gateways.iam.createUser(email, password, displayName);
    ```
 
 2. **Register in main repositories:**
+
    ```typescript
    // src/repositories/database/index.ts
    import { initPatientRepositories } from './patient';
@@ -240,6 +246,7 @@ await context.gateways.iam.createUser(email, password, displayName);
 ### Adding a New Gateway
 
 1. **Create gateway initialization:**
+
    ```typescript
    // src/gateways/email-gateway.ts
    export const initEmailGateway = (config: Config) => {
@@ -252,6 +259,7 @@ await context.gateways.iam.createUser(email, password, displayName);
    ```
 
 2. **Update Gateways type:**
+
    ```typescript
    // src/libs/context.ts
    export type Gateways = {
@@ -261,6 +269,7 @@ await context.gateways.iam.createUser(email, password, displayName);
    ```
 
 3. **Initialize and provide in context:**
+
    ```typescript
    // In GraphQL initialization
    const emailGateway = initEmailGateway(config);
@@ -282,16 +291,19 @@ await context.gateways.iam.createUser(email, password, displayName);
 ## Best Practices
 
 ### 1. **Always Pass Context**
+
 - Use cases always receive `AppContext` as first parameter
 - Resolvers receive `AppContext` as third parameter
 - Don't access dependencies directly (always via context)
 
 ### 2. **Type Safety**
+
 - Use exported types (`Repositories`, `Gateways`, etc.)
 - Type context in function signatures
 - Use type inference where possible
 
 ### 3. **Authentication Checks**
+
 - Check `context.auth.isAuthenticated` before accessing user data
 - Use type guards for safe access:
   ```typescript
@@ -301,11 +313,13 @@ await context.gateways.iam.createUser(email, password, displayName);
   ```
 
 ### 4. **Logging**
+
 - Use `context.logger` for all logging
 - Include relevant context in log messages
 - Use appropriate log levels (info, error, warn, debug)
 
 ### 5. **Configuration**
+
 - Access config via `context.config`
 - Don't import config directly in use cases
 - Keep config structure consistent
@@ -347,12 +361,16 @@ const mockContext: AppContext = {
 describe('createDentist', () => {
   it('should create a dentist', async () => {
     const mockContext = createMockContext();
-    const input = { /* ... */ };
+    const input = {
+      /* ... */
+    };
 
     const result = await createDentist(mockContext, input);
 
     expect(mockContext.repositories.dentist.create).toHaveBeenCalled();
-    expect(result).toMatchObject({ /* ... */ });
+    expect(result).toMatchObject({
+      /* ... */
+    });
   });
 });
 ```
@@ -372,7 +390,7 @@ export const updateDentist = async (
   }
 
   const dentist = await context.repositories.dentist.getById(id);
-  
+
   // Check if user owns the resource
   if (dentist.external_id !== context.auth.externalId) {
     throw new UnauthorizedError('Not authorized');
@@ -389,7 +407,7 @@ if (context.auth.isAuthenticated && context.auth.isImpersonating) {
   // User is impersonating another user
   const targetUserId = context.auth.externalId;
   const impersonatorId = context.auth.impersonatorExternalId;
-  
+
   // Log impersonation actions
   context.logger.info('Impersonation action', {
     targetUserId,
@@ -416,6 +434,3 @@ context.logger.info('Dentist created', {
 - Always pass context as first parameter to use cases
 - Use context for all dependency access (don't import directly)
 - Mock context in tests for isolated unit testing
-
-
-

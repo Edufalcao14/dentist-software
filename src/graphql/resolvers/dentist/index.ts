@@ -12,6 +12,6 @@ export const initDentistModuleResolvers = (usecases: Usecases): Resolvers => {
     Mutation: {
       ...initDentistMutationResolvers(usecases),
     },
-    Dentist: initDentistResolvers(usecases),
+    Dentist: initDentistResolvers(),
   };
 };

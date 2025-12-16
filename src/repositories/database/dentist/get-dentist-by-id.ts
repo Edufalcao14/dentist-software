@@ -7,11 +7,13 @@ export const initGetDentistByIdRepository = (db: PrismaClient) => {
     const dentist = await db.dentist.findUnique({
       where: {
         id,
-        deleted_at: null,
+      },
+      include: {
+        user: true,
       },
     });
 
-    if (!dentist) {
+    if (!dentist || dentist.deleted_at) {
       return null;
     }
 

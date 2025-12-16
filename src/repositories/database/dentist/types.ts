@@ -1,22 +1,20 @@
 import { Prisma } from '@prisma/client';
 
-export type CreateDentistData = Omit<
-  Prisma.DentistUncheckedCreateInput,
-  'clinic_id' | 'specialization' | 'role'
-> & {
-  clinic_id?: number | null;
+export type CreateDentistData = {
+  user_id: number;
+  cro_number: string;
   specialization?: string | null;
   role?: string | null;
+  is_active?: boolean;
+  clinic_id?: number | null;
 };
 
-export type UpdateDentistData = Omit<
-  Prisma.DentistUncheckedUpdateInput,
-  'specialization' | 'role' | 'clinic_id'
-> & {
+export type UpdateDentistData = {
   specialization?:
     | string
     | Prisma.NullableStringFieldUpdateOperationsInput
     | null;
   role?: string | Prisma.NullableStringFieldUpdateOperationsInput | null;
+  is_active?: boolean;
   clinic_id?: number | Prisma.NullableIntFieldUpdateOperationsInput | null;
 };

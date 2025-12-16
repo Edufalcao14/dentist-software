@@ -13,6 +13,9 @@ export const initUpdateDentistRepository = (db: PrismaClient) => {
         id,
       },
       data,
+      include: {
+        user: true,
+      },
     });
 
     return mapToEntity(dentist);

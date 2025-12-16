@@ -3,6 +3,7 @@ import { CreateDentistInput } from '../../entities/dentist/create-dentist-input'
 import { DentistEntity } from '../../entities/dentist/dentist';
 import { DentistRole } from '../../entities/dentist/dentist-role';
 import { DentistSpecialization } from '../../entities/dentist/dentist-specialization';
+import { UserRole } from '../../entities/user/user-role';
 import { BadUserInputError } from '../../entities/errors/bad-user-input-error';
 import * as yup from 'yup';
 
@@ -20,17 +21,23 @@ export const createDentist = async (
     displayName,
   );
 
-  // Then, create dentist with the external_id from Firebase
-  const dentistData = {
+  // Then, create User in database
+  const user = await context.repositories.user.create({
+    external_id: externalId,
+    email: input.email,
     firstname: input.firstname,
     lastname: input.lastname,
     phone_number: input.phone_number,
-    email: input.email,
+    role: UserRole.DENTIST,
+  });
+
+  // Finally, create dentist with the user_id
+  const dentistData = {
+    user_id: parseInt(user.id, 10),
     cro_number: input.cro_number,
     specialization: input.specialization ?? null,
     role: input.role ?? null,
     is_active: input.is_active,
-    external_id: externalId,
     ...(input.clinic_id && { clinic_id: parseInt(input.clinic_id, 10) }),
   };
 
