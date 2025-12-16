@@ -225,6 +225,7 @@ export type Patient = {
   civil_state?: Maybe<Scalars['String']['output']>;
   cpf?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
+  medicalRecord?: Maybe<MedicalRecord>;
   user?: Maybe<User>;
   user_id?: Maybe<Scalars['String']['output']>;
 };
@@ -729,6 +730,11 @@ export type PatientResolvers<
   >;
   cpf?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  medicalRecord?: Resolver<
+    Maybe<ResolversTypes['MedicalRecord']>,
+    ParentType,
+    ContextType
+  >;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   user_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

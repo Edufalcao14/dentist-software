@@ -13,6 +13,11 @@ export const initGetAllPatientsRepository = (db: PrismaClient) => {
       },
       include: {
         user: true,
+        medical_record: {
+          include: {
+            rows: true,
+          },
+        },
       },
       orderBy: {
         created_at: 'desc',

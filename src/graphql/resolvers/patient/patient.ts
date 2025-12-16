@@ -1,4 +1,5 @@
 import { PatientResolvers } from '../../__generated__/resolvers-types';
+import { AppContext } from '../../../libs/context';
 
 export const initPatientResolvers = (): PatientResolvers => ({
   id: (parent) => {
@@ -18,5 +19,17 @@ export const initPatientResolvers = (): PatientResolvers => ({
   },
   civil_state: (parent) => {
     return parent.civil_state ?? null;
+  },
+  medicalRecord: async (parent, _, context: AppContext) => {
+    try {
+      const medicalRecord =
+        await context.repositories.medicalRecord.getByPatientId(
+          parseInt(parent.id, 10),
+        );
+      return medicalRecord ?? null;
+    } catch (error) {
+      // If medical record doesn't exist, return null
+      return null;
+    }
   },
 });

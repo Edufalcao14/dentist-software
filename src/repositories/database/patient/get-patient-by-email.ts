@@ -14,6 +14,11 @@ export const initGetPatientByEmailRepository = (db: PrismaClient) => {
         patient: {
           include: {
             user: true,
+            medical_record: {
+              include: {
+                rows: true,
+              },
+            },
           },
         },
       },

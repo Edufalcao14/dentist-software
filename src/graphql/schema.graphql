@@ -67,6 +67,7 @@ type Patient {
   cpf: String
   birthdate: DateTime!
   civil_state: String
+  medicalRecord: MedicalRecord
 }
 
 type MedicalRecordRow {

@@ -10,6 +10,11 @@ export const initGetPatientByIdRepository = (db: PrismaClient) => {
       },
       include: {
         user: true,
+        medical_record: {
+          include: {
+            rows: true,
+          },
+        },
       },
     });
 
