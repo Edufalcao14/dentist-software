@@ -2,6 +2,7 @@ import { AppContext } from '../../../libs/context';
 import { Usecases } from '../../../usecases';
 import {
   MutationCreatePatientArgs,
+  MutationRegisterPatientArgs,
   MutationUpdatePatientArgs,
   MutationDeletePatientArgs,
   MutationResolvers,
@@ -12,7 +13,7 @@ export const initPatientMutationResolvers = (
   usecases: Usecases,
 ): Pick<
   MutationResolvers,
-  'createPatient' | 'updatePatient' | 'deletePatient'
+  'createPatient' | 'registerPatient' | 'updatePatient' | 'deletePatient'
 > => {
   return {
     createPatient: async (
@@ -26,6 +27,22 @@ export const initPatientMutationResolvers = (
         lastname: args.input.lastname ?? null,
         phone_number: args.input.phone_number ?? null,
         cpf: args.input.cpf ?? null,
+        birthdate: args.input.birthdate,
+        civil_state: args.input.civil_state ?? null,
+      });
+    },
+    registerPatient: async (
+      _,
+      args: MutationRegisterPatientArgs,
+      context: AppContext,
+    ) => {
+      return await usecases.patient.register(context, {
+        email: args.input.email,
+        password: args.input.password,
+        firstname: args.input.firstname,
+        lastname: args.input.lastname,
+        phone_number: args.input.phone_number,
+        cpf: args.input.cpf,
         birthdate: args.input.birthdate,
         civil_state: args.input.civil_state ?? null,
       });

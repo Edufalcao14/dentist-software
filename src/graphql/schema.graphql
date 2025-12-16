@@ -67,6 +67,23 @@ type Patient {
   civil_state: String
 }
 
+type MedicalRecordRow {
+  id: String!
+  question: String!
+  answer: String!
+  medical_record_id: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type MedicalRecord {
+  id: String!
+  patient_id: String!
+  rows: [MedicalRecordRow!]!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
 input CreateDentistInput {
   firstname: String!
   lastname: String!
@@ -102,10 +119,41 @@ input CreatePatientInput {
   civil_state: String
 }
 
+input RegisterPatientInput {
+  email: Email!
+  password: String!
+  firstname: String!
+  lastname: String!
+  phone_number: String!
+  cpf: String!
+  birthdate: DateTime!
+  civil_state: String
+}
+
 input UpdatePatientInput {
   cpf: String
   birthdate: DateTime
   civil_state: String
+}
+
+input CreateMedicalRecordRowInput {
+  question: String!
+  answer: String!
+}
+
+input CreateMedicalRecordInput {
+  patient_id: String!
+  rows: [CreateMedicalRecordRowInput!]!
+}
+
+input UpdateMedicalRecordRowInput {
+  id: String
+  question: String!
+  answer: String!
+}
+
+input UpdateMedicalRecordInput {
+  rows: [UpdateMedicalRecordRowInput!]!
 }
 
 input SignInInput {
@@ -125,6 +173,8 @@ type Query {
   getPatientByCpf(cpf: String!): Patient!
   getPatientByEmail(email: Email!): Patient!
   getAllPatients(limit: Int, offset: Int): [Patient!]!
+  getMedicalRecordById(id: String!): MedicalRecord!
+  getMedicalRecordByPatientId(patientId: String!): MedicalRecord!
   getMe: Me!
 }
 
@@ -134,8 +184,16 @@ type Mutation {
   updateDentist(id: String!, input: UpdateDentistInput!): Dentist!
   deleteDentist(id: String!): Dentist!
   createPatient(input: CreatePatientInput!): Patient!
+  registerPatient(input: RegisterPatientInput!): AuthPayload!
   updatePatient(id: String!, input: UpdatePatientInput!): Patient!
   deletePatient(id: String!): Patient!
+  createMedicalRecord(input: CreateMedicalRecordInput!): MedicalRecord!
+  updateMedicalRecord(
+    id: String!
+    input: UpdateMedicalRecordInput!
+  ): MedicalRecord!
+  deleteMedicalRecord(id: String!): MedicalRecord!
+  deleteMedicalRecordRow(rowId: String!): Boolean!
   signIn(input: SignInInput!): AuthPayload!
   refreshToken(input: RefreshTokenInput!): AuthTokens!
 }

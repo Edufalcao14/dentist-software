@@ -2,6 +2,7 @@ import { initScalars } from './scalars';
 import { initDentistModuleResolvers } from './dentist';
 import { initPatientModuleResolvers } from './patient';
 import { initAuthModuleResolvers } from './auth';
+import { initMedicalRecordResolvers } from './medical-record';
 import { initUserResolvers } from './user/user';
 import { Resolvers } from '../__generated__/resolvers-types';
 import { Usecases } from '../../usecases';
@@ -25,21 +26,30 @@ export const initResolvers = (usecases: Usecases): Resolvers => {
     ...authResolvers
   } = initAuthModuleResolvers(usecases);
 
+  const {
+    Query: medicalRecordQueries,
+    Mutation: medicalRecordMutations,
+    ...medicalRecordResolvers
+  } = initMedicalRecordResolvers(usecases);
+
   return {
     ...initScalars(),
     Query: {
       ...dentistQueries,
       ...patientQueries,
       ...authQueries,
+      ...medicalRecordQueries,
     },
     Mutation: {
       ...dentistMutations,
       ...patientMutations,
       ...authMutations,
+      ...medicalRecordMutations,
     },
     User: initUserResolvers(),
     ...dentistResolvers,
     ...patientResolvers,
     ...authResolvers,
+    ...medicalRecordResolvers,
   };
 };

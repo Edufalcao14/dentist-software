@@ -18,3 +18,5 @@ generates:
         Patient: '../../entities/patient/patient#PatientEntity'
         Me: '../../entities/auth/me#MeEntity'
         AuthTokens: '../../entities/auth/auth-tokens#AuthTokensEntity'
+        MedicalRecord: '../../entities/medical-record/medical-record#MedicalRecordEntity'
+        MedicalRecordRow: '../../entities/medical-record/medical-record-row#MedicalRecordRowEntity'

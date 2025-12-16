@@ -8,6 +8,8 @@ import { DentistEntity } from '../../entities/dentist/dentist';
 import { PatientEntity } from '../../entities/patient/patient';
 import { MeEntity } from '../../entities/auth/me';
 import { AuthTokensEntity } from '../../entities/auth/auth-tokens';
+import { MedicalRecordEntity } from '../../entities/medical-record/medical-record';
+import { MedicalRecordRowEntity } from '../../entities/medical-record/medical-record-row';
 import { AppContext } from '../../libs/context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -71,6 +73,16 @@ export type CreateDentistInput = {
   specialization?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type CreateMedicalRecordInput = {
+  patient_id: Scalars['String']['input'];
+  rows: Array<CreateMedicalRecordRowInput>;
+};
+
+export type CreateMedicalRecordRowInput = {
+  answer: Scalars['String']['input'];
+  question: Scalars['String']['input'];
+};
+
 export type CreatePatientInput = {
   birthdate: Scalars['DateTime']['input'];
   civil_state?: InputMaybe<Scalars['String']['input']>;
@@ -113,21 +125,49 @@ export type Me = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type MedicalRecord = {
+  __typename?: 'MedicalRecord';
+  created_at: Scalars['DateTime']['output'];
+  id: Scalars['String']['output'];
+  patient_id: Scalars['String']['output'];
+  rows: Array<MedicalRecordRow>;
+  updated_at: Scalars['DateTime']['output'];
+};
+
+export type MedicalRecordRow = {
+  __typename?: 'MedicalRecordRow';
+  answer: Scalars['String']['output'];
+  created_at: Scalars['DateTime']['output'];
+  id: Scalars['String']['output'];
+  medical_record_id: Scalars['String']['output'];
+  question: Scalars['String']['output'];
+  updated_at: Scalars['DateTime']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
   createDentist: Dentist;
+  createMedicalRecord: MedicalRecord;
   createPatient: Patient;
   deleteDentist: Dentist;
+  deleteMedicalRecord: MedicalRecord;
+  deleteMedicalRecordRow: Scalars['Boolean']['output'];
   deletePatient: Patient;
   refreshToken: AuthTokens;
+  registerPatient: AuthPayload;
   signIn: AuthPayload;
   updateDentist: Dentist;
+  updateMedicalRecord: MedicalRecord;
   updatePatient: Patient;
 };
 
 export type MutationCreateDentistArgs = {
   input: CreateDentistInput;
+};
+
+export type MutationCreateMedicalRecordArgs = {
+  input: CreateMedicalRecordInput;
 };
 
 export type MutationCreatePatientArgs = {
@@ -138,12 +178,24 @@ export type MutationDeleteDentistArgs = {
   id: Scalars['String']['input'];
 };
 
+export type MutationDeleteMedicalRecordArgs = {
+  id: Scalars['String']['input'];
+};
+
+export type MutationDeleteMedicalRecordRowArgs = {
+  rowId: Scalars['String']['input'];
+};
+
 export type MutationDeletePatientArgs = {
   id: Scalars['String']['input'];
 };
 
 export type MutationRefreshTokenArgs = {
   input: RefreshTokenInput;
+};
+
+export type MutationRegisterPatientArgs = {
+  input: RegisterPatientInput;
 };
 
 export type MutationSignInArgs = {
@@ -153,6 +205,11 @@ export type MutationSignInArgs = {
 export type MutationUpdateDentistArgs = {
   id: Scalars['String']['input'];
   input: UpdateDentistInput;
+};
+
+export type MutationUpdateMedicalRecordArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateMedicalRecordInput;
 };
 
 export type MutationUpdatePatientArgs = {
@@ -177,6 +234,8 @@ export type Query = {
   getDentistByEmail: Dentist;
   getDentistById: Dentist;
   getMe: Me;
+  getMedicalRecordById: MedicalRecord;
+  getMedicalRecordByPatientId: MedicalRecord;
   getPatientByCpf: Patient;
   getPatientByEmail: Patient;
   getPatientById: Patient;
@@ -195,6 +254,14 @@ export type QueryGetDentistByIdArgs = {
   id: Scalars['String']['input'];
 };
 
+export type QueryGetMedicalRecordByIdArgs = {
+  id: Scalars['String']['input'];
+};
+
+export type QueryGetMedicalRecordByPatientIdArgs = {
+  patientId: Scalars['String']['input'];
+};
+
 export type QueryGetPatientByCpfArgs = {
   cpf: Scalars['String']['input'];
 };
@@ -209,6 +276,17 @@ export type QueryGetPatientByIdArgs = {
 
 export type RefreshTokenInput = {
   refreshToken: Scalars['String']['input'];
+};
+
+export type RegisterPatientInput = {
+  birthdate: Scalars['DateTime']['input'];
+  civil_state?: InputMaybe<Scalars['String']['input']>;
+  cpf: Scalars['String']['input'];
+  email: Scalars['Email']['input'];
+  firstname: Scalars['String']['input'];
+  lastname: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  phone_number: Scalars['String']['input'];
 };
 
 export type SignInInput = {
@@ -226,6 +304,16 @@ export type UpdateDentistInput = {
   phone_number?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<Scalars['String']['input']>;
   specialization?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateMedicalRecordInput = {
+  rows: Array<UpdateMedicalRecordRowInput>;
+};
+
+export type UpdateMedicalRecordRowInput = {
+  answer: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['String']['input']>;
+  question: Scalars['String']['input'];
 };
 
 export type UpdatePatientInput = {
@@ -366,6 +454,8 @@ export type ResolversTypes = ResolversObject<{
   AuthTokens: ResolverTypeWrapper<AuthTokensEntity>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   CreateDentistInput: CreateDentistInput;
+  CreateMedicalRecordInput: CreateMedicalRecordInput;
+  CreateMedicalRecordRowInput: CreateMedicalRecordRowInput;
   CreatePatientInput: CreatePatientInput;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Dentist: ResolverTypeWrapper<DentistEntity>;
@@ -373,13 +463,18 @@ export type ResolversTypes = ResolversObject<{
   Email: ResolverTypeWrapper<Scalars['Email']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Me: ResolverTypeWrapper<MeEntity>;
+  MedicalRecord: ResolverTypeWrapper<MedicalRecordEntity>;
+  MedicalRecordRow: ResolverTypeWrapper<MedicalRecordRowEntity>;
   Mutation: ResolverTypeWrapper<{}>;
   Patient: ResolverTypeWrapper<PatientEntity>;
   Query: ResolverTypeWrapper<{}>;
   RefreshTokenInput: RefreshTokenInput;
+  RegisterPatientInput: RegisterPatientInput;
   SignInInput: SignInInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   UpdateDentistInput: UpdateDentistInput;
+  UpdateMedicalRecordInput: UpdateMedicalRecordInput;
+  UpdateMedicalRecordRowInput: UpdateMedicalRecordRowInput;
   UpdatePatientInput: UpdatePatientInput;
   User: ResolverTypeWrapper<UserEntity>;
   UserRole: UserRole;
@@ -393,19 +488,26 @@ export type ResolversParentTypes = ResolversObject<{
   AuthTokens: AuthTokensEntity;
   Boolean: Scalars['Boolean']['output'];
   CreateDentistInput: CreateDentistInput;
+  CreateMedicalRecordInput: CreateMedicalRecordInput;
+  CreateMedicalRecordRowInput: CreateMedicalRecordRowInput;
   CreatePatientInput: CreatePatientInput;
   DateTime: Scalars['DateTime']['output'];
   Dentist: DentistEntity;
   Email: Scalars['Email']['output'];
   Int: Scalars['Int']['output'];
   Me: MeEntity;
+  MedicalRecord: MedicalRecordEntity;
+  MedicalRecordRow: MedicalRecordRowEntity;
   Mutation: {};
   Patient: PatientEntity;
   Query: {};
   RefreshTokenInput: RefreshTokenInput;
+  RegisterPatientInput: RegisterPatientInput;
   SignInInput: SignInInput;
   String: Scalars['String']['output'];
   UpdateDentistInput: UpdateDentistInput;
+  UpdateMedicalRecordInput: UpdateMedicalRecordInput;
+  UpdateMedicalRecordRowInput: UpdateMedicalRecordRowInput;
   UpdatePatientInput: UpdatePatientInput;
   User: UserEntity;
 }>;
@@ -483,6 +585,41 @@ export type MeResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type MedicalRecordResolvers<
+  ContextType = AppContext,
+  ParentType extends
+    ResolversParentTypes['MedicalRecord'] = ResolversParentTypes['MedicalRecord'],
+> = ResolversObject<{
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  patient_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  rows?: Resolver<
+    Array<ResolversTypes['MedicalRecordRow']>,
+    ParentType,
+    ContextType
+  >;
+  updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type MedicalRecordRowResolvers<
+  ContextType = AppContext,
+  ParentType extends
+    ResolversParentTypes['MedicalRecordRow'] = ResolversParentTypes['MedicalRecordRow'],
+> = ResolversObject<{
+  answer?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  medical_record_id?: Resolver<
+    ResolversTypes['String'],
+    ParentType,
+    ContextType
+  >;
+  question?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type MutationResolvers<
   ContextType = AppContext,
   ParentType extends
@@ -494,6 +631,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationCreateDentistArgs, 'input'>
+  >;
+  createMedicalRecord?: Resolver<
+    ResolversTypes['MedicalRecord'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateMedicalRecordArgs, 'input'>
   >;
   createPatient?: Resolver<
     ResolversTypes['Patient'],
@@ -507,6 +650,18 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationDeleteDentistArgs, 'id'>
   >;
+  deleteMedicalRecord?: Resolver<
+    ResolversTypes['MedicalRecord'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteMedicalRecordArgs, 'id'>
+  >;
+  deleteMedicalRecordRow?: Resolver<
+    ResolversTypes['Boolean'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteMedicalRecordRowArgs, 'rowId'>
+  >;
   deletePatient?: Resolver<
     ResolversTypes['Patient'],
     ParentType,
@@ -519,6 +674,12 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationRefreshTokenArgs, 'input'>
   >;
+  registerPatient?: Resolver<
+    ResolversTypes['AuthPayload'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationRegisterPatientArgs, 'input'>
+  >;
   signIn?: Resolver<
     ResolversTypes['AuthPayload'],
     ParentType,
@@ -530,6 +691,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationUpdateDentistArgs, 'id' | 'input'>
+  >;
+  updateMedicalRecord?: Resolver<
+    ResolversTypes['MedicalRecord'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationUpdateMedicalRecordArgs, 'id' | 'input'>
   >;
   updatePatient?: Resolver<
     ResolversTypes['Patient'],
@@ -582,6 +749,18 @@ export type QueryResolvers<
     RequireFields<QueryGetDentistByIdArgs, 'id'>
   >;
   getMe?: Resolver<ResolversTypes['Me'], ParentType, ContextType>;
+  getMedicalRecordById?: Resolver<
+    ResolversTypes['MedicalRecord'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetMedicalRecordByIdArgs, 'id'>
+  >;
+  getMedicalRecordByPatientId?: Resolver<
+    ResolversTypes['MedicalRecord'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetMedicalRecordByPatientIdArgs, 'patientId'>
+  >;
   getPatientByCpf?: Resolver<
     ResolversTypes['Patient'],
     ParentType,
@@ -628,6 +807,8 @@ export type Resolvers<ContextType = AppContext> = ResolversObject<{
   Dentist?: DentistResolvers<ContextType>;
   Email?: GraphQLScalarType;
   Me?: MeResolvers<ContextType>;
+  MedicalRecord?: MedicalRecordResolvers<ContextType>;
+  MedicalRecordRow?: MedicalRecordRowResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Patient?: PatientResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
