@@ -4,6 +4,7 @@ import { BadUserInputError } from '../../entities/errors/bad-user-input-error';
 import { SignInInput } from '../../entities/auth/sign-in-input';
 import { AuthPayload } from '../../entities/user/auth-payload';
 import { NotFoundError } from '../../entities/errors/not-found-error';
+import { UserRole } from '../../entities/user/user-role';
 
 export const signIn = async (
   ctx: AppContext,
@@ -22,10 +23,22 @@ export const signIn = async (
 
   const tokens = await ctx.gateways.iam.signIn(input.email, input.password);
 
+  // Fetch patient or dentist based on user role
+  let patient = null;
+  let dentist = null;
+
+  if (user.role === UserRole.PATIENT) {
+    patient = await ctx.repositories.patient.getByUserId(user.id);
+  } else if (user.role === UserRole.DENTIST) {
+    dentist = await ctx.repositories.dentist.getByUserId(user.id);
+  }
+
   return {
     refreshToken: tokens.refreshToken,
     accessToken: tokens.accessToken,
     user: user,
+    patient,
+    dentist,
   };
 };
 

@@ -36,7 +36,7 @@ export const registerPatient = async (
     civil_state: input.civil_state ?? null,
   };
 
-  await context.repositories.patient.create(patientData);
+  const patient = await context.repositories.patient.create(patientData);
 
   // Sign in the newly created user to return tokens
   const authTokens = await context.gateways.iam.signIn(
@@ -48,6 +48,8 @@ export const registerPatient = async (
     accessToken: authTokens.accessToken,
     refreshToken: authTokens.refreshToken,
     user,
+    patient,
+    dentist: null,
   };
 };
 

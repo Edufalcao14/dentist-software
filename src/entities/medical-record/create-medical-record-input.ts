@@ -4,6 +4,6 @@ export type CreateMedicalRecordRowInput = {
 };
 
 export type CreateMedicalRecordInput = {
-  patient_id: string;
+  user_id: string;
   rows: CreateMedicalRecordRowInput[];
 };

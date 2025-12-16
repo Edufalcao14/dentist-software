@@ -10,4 +10,10 @@ export const initAuthPayloadResolvers = (): AuthPayloadResolvers => ({
   user: (parent) => {
     return parent.user;
   },
+  patient: (parent) => {
+    return parent.patient ?? null;
+  },
+  dentist: (parent) => {
+    return parent.dentist ?? null;
+  },
 });

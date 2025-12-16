@@ -25,7 +25,7 @@ export const initMedicalRecordMutationResolvers = (
       context: AppContext,
     ): Promise<MedicalRecordEntity> => {
       return await usecases.medicalRecord.create(context, {
-        patient_id: args.input.patient_id,
+        user_id: args.input.user_id,
         rows: args.input.rows.map((row) => ({
           question: row.question,
           answer: row.answer,

@@ -45,6 +45,8 @@ type AuthPayload {
   accessToken: String!
   refreshToken: String!
   user: User!
+  patient: Patient
+  dentist: Dentist
 }
 
 type Dentist {
@@ -142,7 +144,7 @@ input CreateMedicalRecordRowInput {
 }
 
 input CreateMedicalRecordInput {
-  patient_id: String!
+  user_id: String!
   rows: [CreateMedicalRecordRowInput!]!
 }
 

@@ -49,6 +49,8 @@ export type Scalars = {
 export type AuthPayload = {
   __typename?: 'AuthPayload';
   accessToken: Scalars['String']['output'];
+  dentist?: Maybe<Dentist>;
+  patient?: Maybe<Patient>;
   refreshToken: Scalars['String']['output'];
   user: User;
 };
@@ -74,8 +76,8 @@ export type CreateDentistInput = {
 };
 
 export type CreateMedicalRecordInput = {
-  patient_id: Scalars['String']['input'];
   rows: Array<CreateMedicalRecordRowInput>;
+  user_id: Scalars['String']['input'];
 };
 
 export type CreateMedicalRecordRowInput = {
@@ -449,7 +451,11 @@ export type DirectiveResolverFn<
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   AuthPayload: ResolverTypeWrapper<
-    Omit<AuthPayload, 'user'> & { user: ResolversTypes['User'] }
+    Omit<AuthPayload, 'dentist' | 'patient' | 'user'> & {
+      dentist?: Maybe<ResolversTypes['Dentist']>;
+      patient?: Maybe<ResolversTypes['Patient']>;
+      user: ResolversTypes['User'];
+    }
   >;
   AuthTokens: ResolverTypeWrapper<AuthTokensEntity>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
@@ -482,7 +488,9 @@ export type ResolversTypes = ResolversObject<{
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  AuthPayload: Omit<AuthPayload, 'user'> & {
+  AuthPayload: Omit<AuthPayload, 'dentist' | 'patient' | 'user'> & {
+    dentist?: Maybe<ResolversParentTypes['Dentist']>;
+    patient?: Maybe<ResolversParentTypes['Patient']>;
     user: ResolversParentTypes['User'];
   };
   AuthTokens: AuthTokensEntity;
@@ -518,6 +526,8 @@ export type AuthPayloadResolvers<
     ResolversParentTypes['AuthPayload'] = ResolversParentTypes['AuthPayload'],
 > = ResolversObject<{
   accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  dentist?: Resolver<Maybe<ResolversTypes['Dentist']>, ParentType, ContextType>;
+  patient?: Resolver<Maybe<ResolversTypes['Patient']>, ParentType, ContextType>;
   refreshToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

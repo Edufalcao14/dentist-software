@@ -2,6 +2,7 @@ import { AppContext } from '../../libs/context';
 import { CreateMedicalRecordInput } from '../../entities/medical-record/create-medical-record-input';
 import { MedicalRecordEntity } from '../../entities/medical-record/medical-record';
 import { BadUserInputError } from '../../entities/errors/bad-user-input-error';
+import { NotFoundError } from '../../entities/errors/not-found-error';
 import { ensureDentistAccess } from '../patient/authorization';
 import * as yup from 'yup';
 
@@ -12,8 +13,16 @@ export const createMedicalRecord = async (
   await ensureDentistAccess(context);
   validateInput(input);
 
+  // Look up patient by user_id
+  const patient = await context.repositories.patient.getByUserId(input.user_id);
+  if (!patient) {
+    throw new NotFoundError(
+      `Paciente com User ID ${input.user_id} não encontrado`,
+    );
+  }
+
   const medicalRecordData = {
-    patient_id: parseInt(input.patient_id, 10),
+    patient_id: parseInt(patient.id, 10),
     rows: input.rows.map((row) => ({
       question: row.question,
       answer: row.answer,
@@ -36,7 +45,7 @@ function validateInput(input: CreateMedicalRecordInput) {
   });
 
   const schema = yup.object<CreateMedicalRecordInput>({
-    patient_id: yup.string().required('ID do paciente é obrigatório'),
+    user_id: yup.string().required('ID do usuário é obrigatório'),
     rows: yup
       .array()
       .of(rowSchema)
