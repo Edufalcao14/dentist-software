@@ -1,7 +1,4 @@
-import {
-  PatientResolvers,
-  UserRole as GraphQLUserRole,
-} from '../../__generated__/resolvers-types';
+import { PatientResolvers } from '../../__generated__/resolvers-types';
 
 export const initPatientResolvers = (): PatientResolvers => ({
   id: (parent) => {
@@ -11,16 +8,7 @@ export const initPatientResolvers = (): PatientResolvers => ({
     return parent.user_id ?? null;
   },
   user: (parent) => {
-    if (!parent.user) {
-      return null;
-    }
-    return {
-      ...parent.user,
-      role:
-        parent.user.role === 'dentist'
-          ? GraphQLUserRole.Dentist
-          : GraphQLUserRole.Patient,
-    };
+    return parent.user ?? null;
   },
   cpf: (parent) => {
     return parent.cpf ?? null;

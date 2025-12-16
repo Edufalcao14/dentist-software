@@ -7,28 +7,7 @@ import {
   QueryGetPatientByEmailArgs,
   QueryGetAllPatientsArgs,
   QueryResolvers,
-  UserRole as GraphQLUserRole,
-  Patient,
 } from '../../__generated__/resolvers-types';
-
-const mapPatientEntityToGraphQL = (entity: PatientEntity): Patient => {
-  return {
-    id: entity.id,
-    user_id: entity.user_id ?? null,
-    user: entity.user
-      ? {
-          ...entity.user,
-          role:
-            entity.user.role === 'dentist'
-              ? GraphQLUserRole.Dentist
-              : GraphQLUserRole.Patient,
-        }
-      : null,
-    cpf: entity.cpf ?? null,
-    birthdate: entity.birthdate,
-    civil_state: entity.civil_state ?? null,
-  };
-};
 
 export const initPatientQueryResolvers = (
   usecases: Usecases,
@@ -41,36 +20,32 @@ export const initPatientQueryResolvers = (
       _,
       args: QueryGetPatientByIdArgs,
       context: AppContext,
-    ): Promise<Patient> => {
-      const entity = await usecases.patient.getById(context, args.id);
-      return mapPatientEntityToGraphQL(entity);
+    ): Promise<PatientEntity> => {
+      return usecases.patient.getById(context, args.id);
     },
     getPatientByCpf: async (
       _,
       args: QueryGetPatientByCpfArgs,
       context: AppContext,
-    ): Promise<Patient> => {
-      const entity = await usecases.patient.getByCpf(context, args.cpf);
-      return mapPatientEntityToGraphQL(entity);
+    ): Promise<PatientEntity> => {
+      return usecases.patient.getByCpf(context, args.cpf);
     },
     getPatientByEmail: async (
       _,
       args: QueryGetPatientByEmailArgs,
       context: AppContext,
-    ): Promise<Patient> => {
-      const entity = await usecases.patient.getByEmail(context, args.email);
-      return mapPatientEntityToGraphQL(entity);
+    ): Promise<PatientEntity> => {
+      return usecases.patient.getByEmail(context, args.email);
     },
     getAllPatients: async (
       _,
       args: QueryGetAllPatientsArgs,
       context: AppContext,
-    ): Promise<Patient[]> => {
-      const entities = await usecases.patient.getAll(context, {
+    ): Promise<PatientEntity[]> => {
+      return usecases.patient.getAll(context, {
         limit: args.limit ?? undefined,
         offset: args.offset ?? undefined,
       });
-      return entities.map(mapPatientEntityToGraphQL);
     },
   };
 };

@@ -3,6 +3,7 @@ import { initCreatePatientRepository } from './create-patient';
 import { initGetPatientByIdRepository } from './get-patient-by-id';
 import { initGetPatientByCpfRepository } from './get-patient-by-cpf';
 import { initGetPatientByEmailRepository } from './get-patient-by-email';
+import { initGetPatientByUserIdRepository } from './get-patient-by-user-id';
 import { initGetAllPatientsRepository } from './get-all-patients';
 import { initUpdatePatientRepository } from './update-patient';
 import { initSoftDeletePatientRepository } from './soft-delete-patient';
@@ -15,6 +16,7 @@ export const initPatientRepositories = (db: PrismaClient) => {
     getById: initGetPatientByIdRepository(db),
     getByCpf: initGetPatientByCpfRepository(db),
     getByEmail: initGetPatientByEmailRepository(db),
+    getByUserId: initGetPatientByUserIdRepository(db),
     getAll: initGetAllPatientsRepository(db),
     update: initUpdatePatientRepository(db),
     softDelete: initSoftDeletePatientRepository(db),

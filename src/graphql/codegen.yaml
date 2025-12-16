@@ -13,4 +13,8 @@ generates:
       # More on this below!
       contextType: '../../libs/context#AppContext'
       mappers:
+        User: '../../entities/user/user#UserEntity'
         Dentist: '../../entities/dentist/dentist#DentistEntity'
+        Patient: '../../entities/patient/patient#PatientEntity'
+        Me: '../../entities/auth/me#MeEntity'
+        AuthTokens: '../../entities/auth/auth-tokens#AuthTokensEntity'

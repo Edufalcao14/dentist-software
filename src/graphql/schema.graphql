@@ -22,6 +22,31 @@ type User {
   role: UserRole!
 }
 
+type Me {
+  id: String!
+  displayName: String!
+  email: Email!
+  externalId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  teamId: String
+  dentist: Dentist
+  patient: Patient
+}
+
+type AuthTokens {
+  accessToken: String!
+  refreshToken: String!
+  expiredAt: DateTime!
+}
+
+type AuthPayload {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
+}
+
 type Dentist {
   id: String!
   user_id: String!
@@ -83,6 +108,15 @@ input UpdatePatientInput {
   civil_state: String
 }
 
+input SignInInput {
+  email: Email!
+  password: String!
+}
+
+input RefreshTokenInput {
+  refreshToken: String!
+}
+
 type Query {
   _empty: String
   getDentistById(id: String!): Dentist!
@@ -91,6 +125,7 @@ type Query {
   getPatientByCpf(cpf: String!): Patient!
   getPatientByEmail(email: Email!): Patient!
   getAllPatients(limit: Int, offset: Int): [Patient!]!
+  getMe: Me!
 }
 
 type Mutation {
@@ -101,4 +136,6 @@ type Mutation {
   createPatient(input: CreatePatientInput!): Patient!
   updatePatient(id: String!, input: UpdatePatientInput!): Patient!
   deletePatient(id: String!): Patient!
+  signIn(input: SignInInput!): AuthPayload!
+  refreshToken(input: RefreshTokenInput!): AuthTokens!
 }

@@ -3,7 +3,11 @@ import {
   GraphQLScalarType,
   GraphQLScalarTypeConfig,
 } from 'graphql';
+import { UserEntity } from '../../entities/user/user';
 import { DentistEntity } from '../../entities/dentist/dentist';
+import { PatientEntity } from '../../entities/patient/patient';
+import { MeEntity } from '../../entities/auth/me';
+import { AuthTokensEntity } from '../../entities/auth/auth-tokens';
 import { AppContext } from '../../libs/context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -25,6 +29,7 @@ export type Incremental<T> =
   | {
       [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
     };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
   [P in K]-?: NonNullable<T[P]>;
 };
@@ -37,6 +42,20 @@ export type Scalars = {
   Float: { input: number; output: number };
   DateTime: { input: any; output: any };
   Email: { input: any; output: any };
+};
+
+export type AuthPayload = {
+  __typename?: 'AuthPayload';
+  accessToken: Scalars['String']['output'];
+  refreshToken: Scalars['String']['output'];
+  user: User;
+};
+
+export type AuthTokens = {
+  __typename?: 'AuthTokens';
+  accessToken: Scalars['String']['output'];
+  expiredAt: Scalars['DateTime']['output'];
+  refreshToken: Scalars['String']['output'];
 };
 
 export type CreateDentistInput = {
@@ -80,6 +99,20 @@ export enum DentistRole {
   Hired = 'hired',
 }
 
+export type Me = {
+  __typename?: 'Me';
+  createdAt: Scalars['DateTime']['output'];
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  dentist?: Maybe<Dentist>;
+  displayName: Scalars['String']['output'];
+  email: Scalars['Email']['output'];
+  externalId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  patient?: Maybe<Patient>;
+  teamId?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
@@ -87,6 +120,8 @@ export type Mutation = {
   createPatient: Patient;
   deleteDentist: Dentist;
   deletePatient: Patient;
+  refreshToken: AuthTokens;
+  signIn: AuthPayload;
   updateDentist: Dentist;
   updatePatient: Patient;
 };
@@ -105,6 +140,14 @@ export type MutationDeleteDentistArgs = {
 
 export type MutationDeletePatientArgs = {
   id: Scalars['String']['input'];
+};
+
+export type MutationRefreshTokenArgs = {
+  input: RefreshTokenInput;
+};
+
+export type MutationSignInArgs = {
+  input: SignInInput;
 };
 
 export type MutationUpdateDentistArgs = {
@@ -133,6 +176,7 @@ export type Query = {
   getAllPatients: Array<Patient>;
   getDentistByEmail: Dentist;
   getDentistById: Dentist;
+  getMe: Me;
   getPatientByCpf: Patient;
   getPatientByEmail: Patient;
   getPatientById: Patient;
@@ -161,6 +205,15 @@ export type QueryGetPatientByEmailArgs = {
 
 export type QueryGetPatientByIdArgs = {
   id: Scalars['String']['input'];
+};
+
+export type RefreshTokenInput = {
+  refreshToken: Scalars['String']['input'];
+};
+
+export type SignInInput = {
+  email: Scalars['Email']['input'];
+  password: Scalars['String']['input'];
 };
 
 export type UpdateDentistInput = {
@@ -307,6 +360,10 @@ export type DirectiveResolverFn<
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
+  AuthPayload: ResolverTypeWrapper<
+    Omit<AuthPayload, 'user'> & { user: ResolversTypes['User'] }
+  >;
+  AuthTokens: ResolverTypeWrapper<AuthTokensEntity>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   CreateDentistInput: CreateDentistInput;
   CreatePatientInput: CreatePatientInput;
@@ -315,18 +372,25 @@ export type ResolversTypes = ResolversObject<{
   DentistRole: DentistRole;
   Email: ResolverTypeWrapper<Scalars['Email']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  Me: ResolverTypeWrapper<MeEntity>;
   Mutation: ResolverTypeWrapper<{}>;
-  Patient: ResolverTypeWrapper<Patient>;
+  Patient: ResolverTypeWrapper<PatientEntity>;
   Query: ResolverTypeWrapper<{}>;
+  RefreshTokenInput: RefreshTokenInput;
+  SignInInput: SignInInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   UpdateDentistInput: UpdateDentistInput;
   UpdatePatientInput: UpdatePatientInput;
-  User: ResolverTypeWrapper<User>;
+  User: ResolverTypeWrapper<UserEntity>;
   UserRole: UserRole;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
+  AuthPayload: Omit<AuthPayload, 'user'> & {
+    user: ResolversParentTypes['User'];
+  };
+  AuthTokens: AuthTokensEntity;
   Boolean: Scalars['Boolean']['output'];
   CreateDentistInput: CreateDentistInput;
   CreatePatientInput: CreatePatientInput;
@@ -334,13 +398,38 @@ export type ResolversParentTypes = ResolversObject<{
   Dentist: DentistEntity;
   Email: Scalars['Email']['output'];
   Int: Scalars['Int']['output'];
+  Me: MeEntity;
   Mutation: {};
-  Patient: Patient;
+  Patient: PatientEntity;
   Query: {};
+  RefreshTokenInput: RefreshTokenInput;
+  SignInInput: SignInInput;
   String: Scalars['String']['output'];
   UpdateDentistInput: UpdateDentistInput;
   UpdatePatientInput: UpdatePatientInput;
-  User: User;
+  User: UserEntity;
+}>;
+
+export type AuthPayloadResolvers<
+  ContextType = AppContext,
+  ParentType extends
+    ResolversParentTypes['AuthPayload'] = ResolversParentTypes['AuthPayload'],
+> = ResolversObject<{
+  accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  refreshToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type AuthTokensResolvers<
+  ContextType = AppContext,
+  ParentType extends
+    ResolversParentTypes['AuthTokens'] = ResolversParentTypes['AuthTokens'],
+> = ResolversObject<{
+  accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  expiredAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  refreshToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export interface DateTimeScalarConfig
@@ -373,6 +462,27 @@ export interface EmailScalarConfig
   name: 'Email';
 }
 
+export type MeResolvers<
+  ContextType = AppContext,
+  ParentType extends ResolversParentTypes['Me'] = ResolversParentTypes['Me'],
+> = ResolversObject<{
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  deletedAt?: Resolver<
+    Maybe<ResolversTypes['DateTime']>,
+    ParentType,
+    ContextType
+  >;
+  dentist?: Resolver<Maybe<ResolversTypes['Dentist']>, ParentType, ContextType>;
+  displayName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['Email'], ParentType, ContextType>;
+  externalId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  patient?: Resolver<Maybe<ResolversTypes['Patient']>, ParentType, ContextType>;
+  teamId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type MutationResolvers<
   ContextType = AppContext,
   ParentType extends
@@ -402,6 +512,18 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationDeletePatientArgs, 'id'>
+  >;
+  refreshToken?: Resolver<
+    ResolversTypes['AuthTokens'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationRefreshTokenArgs, 'input'>
+  >;
+  signIn?: Resolver<
+    ResolversTypes['AuthPayload'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationSignInArgs, 'input'>
   >;
   updateDentist?: Resolver<
     ResolversTypes['Dentist'],
@@ -459,6 +581,7 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryGetDentistByIdArgs, 'id'>
   >;
+  getMe?: Resolver<ResolversTypes['Me'], ParentType, ContextType>;
   getPatientByCpf?: Resolver<
     ResolversTypes['Patient'],
     ParentType,
@@ -499,9 +622,12 @@ export type UserResolvers<
 }>;
 
 export type Resolvers<ContextType = AppContext> = ResolversObject<{
+  AuthPayload?: AuthPayloadResolvers<ContextType>;
+  AuthTokens?: AuthTokensResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
   Dentist?: DentistResolvers<ContextType>;
   Email?: GraphQLScalarType;
+  Me?: MeResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Patient?: PatientResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
